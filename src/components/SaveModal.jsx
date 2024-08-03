@@ -5,14 +5,15 @@ import {
   TouchableOpacity,
   Modal,
   StyleSheet,
-  Dimensions,
   TouchableWithoutFeedback,
   Image,
+  ToastAndroid,
 } from 'react-native';
+import constants from '../config/constants';
 
-const {width} = Dimensions.get('window');
+const {height, width} = constants.screen;
 
-const SaveModal = ({visible, onClose}) => {
+const SaveModal = ({visible, onClose, onNormal}) => {
   return (
     <Modal
       transparent={true}
@@ -22,15 +23,24 @@ const SaveModal = ({visible, onClose}) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Choose Quality</Text>
-            <TouchableOpacity style={styles.modalButton} onPress={onClose}>
-              <Text style={styles.modalButtonText}>Normal</Text>
+            <Text style={styles.modalTitle} allowFontScaling={false}>
+              Choose Quality
+            </Text>
+            <TouchableOpacity style={styles.modalButton} onPress={onNormal}>
+              <Text style={styles.modalButtonText} allowFontScaling={false}>
+                Normal
+              </Text>
             </TouchableOpacity>
             <View style={styles.superResolutionContainer}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.superResolutionButton]}
-                onPress={onClose}>
-                <Text style={[styles.modalButtonText, {color: '#202455'}]}>
+                onPress={() => {
+                  ToastAndroid.show('Coming soon..', ToastAndroid.SHORT);
+                  onClose();
+                }}>
+                <Text
+                  style={[styles.modalButtonText, {color: '#202455'}]}
+                  allowFontScaling={false}>
                   Super Resolution
                 </Text>
               </TouchableOpacity>
@@ -58,21 +68,21 @@ const styles = StyleSheet.create({
     width: '80%',
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    padding: height * 0.025,
     alignItems: 'center',
   },
   modalTitle: {
-    color: '#5B5B5B',
-    fontSize: width * 0.05,
+    color: constants.colors.textSecondary,
+    fontSize: constants.fontSizes.medium + 2,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: height * 0.02,
   },
   modalButton: {
     width: '100%',
-    backgroundColor: '#202455',
+    backgroundColor: constants.colors.primary,
     borderRadius: 20,
-    paddingVertical: 10,
-    marginVertical: 10,
+    paddingVertical: height * 0.012,
+    marginVertical: height * 0.012,
     alignItems: 'center',
   },
   superResolutionContainer: {
@@ -82,11 +92,11 @@ const styles = StyleSheet.create({
   superResolutionButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#202455',
+    borderColor: constants.colors.primary,
   },
   modalButtonText: {
-    color: 'white',
-    fontSize: width * 0.04,
+    color: constants.colors.white,
+    fontSize: constants.fontSizes.small,
   },
   crownIcon: {
     position: 'absolute',

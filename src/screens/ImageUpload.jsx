@@ -1,56 +1,27 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Image,
   StyleSheet,
   Text,
-  ToastAndroid,
   TouchableOpacity,
   View,
+  ActivityIndicator,
 } from 'react-native';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {useNavigation} from '@react-navigation/native';
+import constants from '../config/constants';
+import {openCamera, openImagePicker} from '../utils/imagePicker';
+import {removeBackground} from '../utils/removeBackgroundAPI';
+
+const {height, width} = constants.screen;
 
 const ImageUpload = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
-  let options = {
-    mediaType: 'photo',
-    quality: 1,
-    includeBase64: true,
-  };
-
-  const openImagePicker = () => {
-    launchImageLibrary(options, response => {
-      if (!response) {
-        console.log('Invalid response from image picker');
-        return;
-      }
-      if (response.didCancel) {
-        ToastAndroid.show('User cancelled Image Picker', ToastAndroid.SHORT);
-        return;
-      }
-      if (response.assets) {
-        const uri = response.assets[0].uri;
-        navigation.navigate('Home', {image: uri});
-      }
-    });
-  };
-
-  const openCamera = () => {
-    launchCamera(options, response => {
-      if (!response) {
-        console.log('Invalid response from camera');
-        return;
-      }
-      if (response.didCancel) {
-        ToastAndroid.show('User cancelled Camera', ToastAndroid.SHORT);
-        return;
-      }
-      if (response.assets) {
-        const uri = response.assets[0].uri;
-        navigation.navigate('Home', {image: uri});
-      }
-    });
+  const handleImagePicked = uri => {
+    // uri comes from openGallery or openCamera from imagePicker.jsx.
+    // sending uri to call api for background removal.
+    removeBackground(uri, setIsLoading, navigation);
   };
 
   return (
@@ -60,23 +31,45 @@ const ImageUpload = () => {
         style={styles.mainImageStyle}
         resizeMode="contain"
       />
-      <Text style={styles.textStyle}>Choose an image</Text>
-      <TouchableOpacity style={styles.buttonContainer} onPress={openCamera}>
+      <Text style={styles.textStyle} allowFontScaling={false}>
+        Choose an image
+      </Text>
+      <TouchableOpacity
+        style={styles.buttonContainer}
+        onPress={() => openCamera(handleImagePicked)}>
         <Image
           source={require('../assets/icons/camera.png')}
           style={styles.iconStyle}
         />
-        <Text style={styles.buttonText}>Camera</Text>
+        <Text style={styles.buttonText} allowFontScaling={false}>
+          Camera
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.buttonContainer}
-        onPress={openImagePicker}>
+        onPress={() => openImagePicker(handleImagePicked)}>
         <Image
           source={require('../assets/icons/gallery.png')}
           style={styles.iconStyle}
         />
-        <Text style={styles.buttonText}>Gallery</Text>
+        <Text style={styles.buttonText} allowFontScaling={false}>
+          Gallery
+        </Text>
       </TouchableOpacity>
+
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={constants.colors.primary} />
+          <Text
+            style={[styles.loadingText, {fontSize: 18}]}
+            allowFontScaling={false}>
+            Processing
+          </Text>
+          <Text style={styles.loadingText} allowFontScaling={false}>
+            Please wait
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -84,7 +77,7 @@ const ImageUpload = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: constants.colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -99,29 +92,43 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   textStyle: {
-    fontSize: 18,
-    color: '#5B5B5B',
-    marginTop: '20%',
-    marginBottom: 20,
+    fontSize: constants.fontSizes.medium,
+    color: constants.colors.textSecondary,
+    marginTop: height * 0.09,
+    marginBottom: height * 0.02,
   },
   buttonContainer: {
-    width: '95%',
-    backgroundColor: '#F4F4F4',
+    width: width * 0.85,
+    backgroundColor: constants.colors.secondary,
     borderRadius: 40,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginVertical: 10,
+    paddingVertical: height * 0.013,
+    marginVertical: height * 0.012,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: 'black',
+    shadowColor: constants.colors.black,
     elevation: 1,
   },
   buttonText: {
-    color: '#000000',
-    fontSize: 18,
+    color: constants.colors.black,
+    fontSize: constants.fontSizes.medium,
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: width * 0.02,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: constants.colors.primary,
+    marginTop: 10,
   },
 });
 

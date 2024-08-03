@@ -1,16 +1,9 @@
 import {useNavigation} from '@react-navigation/native';
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import constants from '../config/constants';
 
-const {height} = Dimensions.get('window');
-
+const {height, width} = constants.screen;
 const Welcome = () => {
   const navigation = useNavigation();
   return (
@@ -19,15 +12,23 @@ const Welcome = () => {
         source={require('../assets/images/logo.png')}
         style={styles.imageStyle}
       />
-      <Text style={styles.titleStyle}>Transparify</Text>
-      <Text style={styles.textStyle}>Easily transform your images into</Text>
-      <Text style={styles.textStyle}>transparent PNGs.</Text>
+      <Text style={styles.titleStyle} allowFontScaling={false}>
+        Transparify
+      </Text>
+      <Text style={styles.textStyle} allowFontScaling={false}>
+        Easily transform your images into
+      </Text>
+      <Text style={styles.textStyle} allowFontScaling={false}>
+        transparent PNGs.
+      </Text>
       <TouchableOpacity
         style={styles.buttonContainer}
         onPress={() => {
           navigation.navigate('Image Upload' as never);
         }}>
-        <Text style={styles.buttonText}>Get Started</Text>
+        <Text style={styles.buttonText} allowFontScaling={false}>
+          Get Started
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -36,39 +37,39 @@ const Welcome = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: constants.colors.white,
     alignItems: 'center',
-    paddingHorizontal: '7%',
+    paddingHorizontal: width * 0.07,
     justifyContent: 'center',
   },
   imageStyle: {
     marginTop: height * 0.3,
   },
   titleStyle: {
-    fontSize: 25,
+    fontSize: constants.fontSizes.xlarge,
     fontWeight: 'bold',
-    color: '#000000',
+    color: constants.colors.black,
     marginBottom: height * 0.05,
   },
   textStyle: {
-    fontSize: 18,
-    color: '#5B5B5B',
+    fontSize: constants.fontSizes.medium,
+    color: constants.colors.textSecondary,
     textAlign: 'center',
-    marginBottom: 5,
+    marginBottom: height * 0.005,
   },
   buttonContainer: {
     width: '100%',
-    backgroundColor: '#202455',
-    borderRadius: 40,
-    padding: 12,
+    backgroundColor: constants.colors.primary,
+    borderRadius: height * 0.04,
+    padding: height * 0.015,
     marginTop: height * 0.2,
     alignItems: 'center',
     shadowColor: '#202455',
     elevation: 5,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
+    color: constants.colors.white,
+    fontSize: constants.fontSizes.medium,
     fontWeight: 'bold',
   },
 });
