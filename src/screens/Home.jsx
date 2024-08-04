@@ -5,18 +5,16 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ToastAndroid,
   Animated,
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
-import RNFS from 'react-native-fs';
-import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import LinearGradient from 'react-native-linear-gradient';
 import ToggleButtons from '../components/ToggleButtons';
 import SaveModal from '../components/SaveModal';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
 const {width, height} = constants.screen;
+import {saveImageToGallery} from '../utils/imageSaver';
 
 const Home = ({route}) => {
   const viewShotRef = useRef(null);
@@ -30,7 +28,6 @@ const Home = ({route}) => {
   const [selectedBackgroundImage, setSelectedBackgroundImage] = useState(null);
   const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
   const [hasTransitioned, setHasTransitioned] = useState(false);
-
   const transitionValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -70,46 +67,10 @@ const Home = ({route}) => {
     );
   }, [originalImage]);
 
-  const saveImageToGallery = async () => {
-    try {
-      if (!viewShotRef.current) {
-        throw new Error('ViewShot ref is not available');
-      }
-
-      const uri = await viewShotRef.current.capture({
-        quality: 1,
-        format: 'png',
-        result: 'tmpfile',
-        // width: imageDimensions.width * 2, // Capture at 2x size
-        // height: imageDimensions.height * 2,
-      });
-
-      if (!uri) {
-        throw new Error('Failed to capture screenshot');
-      }
-
-      const fileName = `transparify_${Date.now()}.png`;
-      const directory = `${RNFS.PicturesDirectoryPath}/Transparify`;
-      // console.log('Directory Path:', directory); // Log the directory path
-      await RNFS.mkdir(directory);
-
-      const newPath = `${directory}/${fileName}`;
-      await RNFS.copyFile(uri, newPath);
-
-      await CameraRoll.saveAsset(`file://${newPath}`, {
-        type: 'photo',
-        album: 'Transparify',
-      });
-
-      // console.log('Image saved to gallery:', newPath);
-      ToastAndroid.show('Image saved to gallery', ToastAndroid.SHORT);
+  const handleSaveImage = async () => {
+    const success = await saveImageToGallery(viewShotRef);
+    if (success) {
       setIsModalVisible(false);
-    } catch (error) {
-      console.error('Error saving image:', error);
-      ToastAndroid.show(
-        'Error: Failed to save image. Please try again.',
-        ToastAndroid.SHORT,
-      );
     }
   };
 
@@ -279,7 +240,7 @@ const Home = ({route}) => {
         />
       </View>
       <SaveModal
-        onNormal={saveImageToGallery}
+        onNormal={handleSaveImage}
         visible={isModalVisible}
         onClose={() => setIsModalVisible(!isModalVisible)}
       />
@@ -312,7 +273,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: constants.colors.white,
-    fontSize: width * 0.04,
+    fontSize: constants.fontSizes.small,
   },
   contentContainer: {
     flex: 1,
@@ -344,5 +305,4 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-
 export default Home;

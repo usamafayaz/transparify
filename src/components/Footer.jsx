@@ -1,6 +1,4 @@
-// components/Footer.js
-
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -15,6 +13,8 @@ import {basicColors, gradientColors} from '../config/colors';
 import constants from '../config/constants';
 import {openImagePicker} from '../utils/imagePicker';
 
+import ColorPickerModal from './ColorPickerModal';
+
 const {width, height} = Dimensions.get('window');
 
 const Footer = ({
@@ -26,6 +26,13 @@ const Footer = ({
   handleColorSelect,
   selectGalleryImage,
 }) => {
+  const [colorModal, setColorModal] = useState(false);
+
+  const onSelectColor = hex => {
+    handleColorSelect(hex); // Call the provided handleColorSelect function
+    setColorModal(false);
+  };
+
   const renderColorOption = ({item}) => (
     <TouchableOpacity
       style={[styles.footerButton, {backgroundColor: item}]}
@@ -126,7 +133,7 @@ const Footer = ({
           {(colorState === 'solid' || colorState === 'gradient') && (
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => updateFooter('initial')}>
+              onPress={() => setColorModal(true)}>
               <Image
                 source={require('../assets/icons/color_picker.png')}
                 style={styles.footerIcon}
@@ -153,6 +160,11 @@ const Footer = ({
           )}
         </View>
       )}
+      <ColorPickerModal
+        visible={colorModal}
+        onCancel={() => setColorModal(false)}
+        onColorSelected={onSelectColor}
+      />
     </View>
   );
 };
@@ -161,7 +173,7 @@ const styles = StyleSheet.create({
   footerContainer: {
     width: '100%',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: constants.colors.white,
     paddingBottom: height * 0.03,
   },
   footerText: {
@@ -175,7 +187,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.02,
   },
   footerButton: {
-    backgroundColor: '#F4F4F4',
+    backgroundColor: constants.colors.secondary,
     height: width * 0.17,
     width: width * 0.17,
     justifyContent: 'center',
@@ -191,7 +203,7 @@ const styles = StyleSheet.create({
   footerButtonText: {
     fontSize: constants.fontSizes.xsmall,
     fontWeight: '500',
-    color: '#000000',
+    color: constants.colors.black,
   },
 });
 
