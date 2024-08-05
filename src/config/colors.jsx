@@ -80,3 +80,5 @@ for (let i = 0; i < 20; i++) {
   }
   gradientColors.push([color1, color2]);
 }*/
+
+//    "react-native-reanimated": "^3.8.1",

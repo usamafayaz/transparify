@@ -30,7 +30,6 @@ const Footer = ({
 
   const onSelectColor = hex => {
     handleColorSelect(hex); // Call the provided handleColorSelect function
-    setColorModal(false);
   };
 
   const renderColorOption = ({item}) => (
@@ -130,7 +129,7 @@ const Footer = ({
               style={styles.footerIcon}
             />
           </TouchableOpacity>
-          {(colorState === 'solid' || colorState === 'gradient') && (
+          {colorState === 'solid' && (
             <TouchableOpacity
               style={styles.footerButton}
               onPress={() => setColorModal(true)}>

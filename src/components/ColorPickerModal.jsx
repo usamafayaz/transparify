@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,36 +6,65 @@ import {
   Modal,
   StyleSheet,
   TouchableWithoutFeedback,
+  ActivityIndicator,
 } from 'react-native';
-import {ColorPicker} from 'react-native-color-picker';
-import Slider from '@react-native-community/slider';
+import ColorPicker from 'react-native-wheel-color-picker';
+
 import constants from '../config/constants';
 const {height, width} = constants.screen;
+
 const ColorPickerModal = ({visible, onCancel, onColorSelected}) => {
-  const onSelectColor = hex => {
-    onColorSelected(hex);
+  const [selectedColor, setSelectedColor] = useState('#000000');
+
+  const onColorChange = color => {
+    setSelectedColor(color);
+  };
+
+  const handleColorSelection = () => {
+    onColorSelected(selectedColor);
     onCancel();
   };
+
   return (
     <Modal visible={visible} transparent animationType="slide">
       <TouchableWithoutFeedback onPress={onCancel}>
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle} allowFontScaling={false}>
-              Color Picker
-            </Text>
-            <ColorPicker
-              defaultColor={'#000000'}
-              onColorSelected={onSelectColor}
-              style={styles.colorPicker}
-              sliderComponent={Slider}
-            />
-            <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-              <Text style={styles.cancelButtonText} allowFontScaling={false}>
-                Cancel
+          <TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle} allowFontScaling={false}>
+                Color Picker
               </Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.colorPickerContainer}>
+                <ColorPicker
+                  color={selectedColor}
+                  onColorChange={onColorChange}
+                  onColorChangeComplete={onColorChange}
+                  thumbSize={30}
+                  sliderSize={0}
+                  noSnap={true}
+                  row={false}
+                  swatchesLast={false}
+                  swatches={true}
+                  discrete={false}
+                  useNativeDriver={true}
+                />
+              </View>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleColorSelection}>
+                  <Text style={styles.buttonText} allowFontScaling={false}>
+                    Select
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={onCancel}>
+                  <Text style={styles.buttonText} allowFontScaling={false}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -54,7 +83,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
-    width: '80%',
+    width: '90%',
+    maxHeight: '80%',
   },
   modalTitle: {
     color: constants.colors.white,
@@ -62,18 +92,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  colorPicker: {
-    width: width * 0.5,
-    height: height * 0.3,
+  colorPickerContainer: {
+    width: '100%',
+    aspectRatio: 1,
   },
-  cancelButton: {
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
     marginTop: 20,
+  },
+  button: {
     backgroundColor: constants.colors.secondary,
     paddingVertical: height * 0.012,
     paddingHorizontal: width * 0.05,
     borderRadius: 20,
   },
-  cancelButtonText: {
+  buttonText: {
     color: constants.colors.primary,
     fontSize: constants.fontSizes.small,
   },
