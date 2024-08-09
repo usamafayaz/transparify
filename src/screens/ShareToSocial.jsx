@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Linking,
-  Share,
-} from 'react-native';
+import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import Share from 'react-native-share';
 import constants from '../config/constants';
 
 const {width, height} = constants.screen;
@@ -16,45 +9,50 @@ const ShareToSocial = ({route}) => {
   const {processedImage} = route.params;
 
   const handleShare = async platform => {
-    let url;
+    let shareOptions;
 
     switch (platform) {
       case 'WhatsApp':
-        url = `whatsapp://send?text=Check out this image!&url=${processedImage}`;
+        shareOptions = {
+          title: 'Share Image',
+          message: 'Check out this image!',
+          url: processedImage,
+          social: Share.Social.WHATSAPP,
+        };
         break;
       case 'Facebook':
-        url = `https://www.facebook.com/sharer/sharer.php?u=${processedImage}`;
+        shareOptions = {
+          title: 'Share Image',
+          message: 'Check out this image!',
+          url: processedImage,
+          social: Share.Social.SNAPCHAT,
+        };
         break;
       case 'Instagram':
-        url = `instagram://share?url=${processedImage}`;
+        shareOptions = {
+          title: 'Share Image',
+          message: 'Check out this image!',
+          url: processedImage,
+          social: Share.Social.FACEBOOK,
+        };
         break;
       case 'Share':
-        try {
-          const shareOptions = {
-            title: 'Share Image',
-            message: 'Check out this image!',
-            url: processedImage,
-          };
-          await Share.share(shareOptions);
-          return; // Exit the function after sharing
-        } catch (error) {
-          console.error('Error sharing image:', error);
-          return;
-        }
+        shareOptions = {
+          title: 'Share Image',
+          message: 'Check out this image!',
+          url: processedImage,
+          social: Share.Social.FACEBOOK,
+        };
+        break;
       default:
         alert('Unsupported platform');
         return;
     }
 
     try {
-      const canOpen = await Linking.canOpenURL(url);
-      if (canOpen) {
-        Linking.openURL(url);
-      } else {
-        alert(`${platform} is not installed on your device.`);
-      }
+      await Share.shareSingle(shareOptions);
     } catch (error) {
-      console.error(`Failed to share image to ${platform}:`, error);
+      console.error('Error sharing image:', error);
     }
   };
 
@@ -144,6 +142,8 @@ const styles = StyleSheet.create({
     width: '60%',
   },
   iconStyle: {
+    height: height * 0.12,
+    width: width * 0.12,
     resizeMode: 'contain',
   },
 });
