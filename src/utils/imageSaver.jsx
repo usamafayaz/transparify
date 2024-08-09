@@ -1,9 +1,15 @@
 import RNFS from 'react-native-fs';
 import {CameraRoll} from '@react-native-camera-roll/camera-roll';
 import {ToastAndroid} from 'react-native';
+import Permissions from './permissions';
 
 export const saveImageToGallery = async viewShotRef => {
   try {
+    const galleryPermissionGranted = await Permissions.checkGalleryPermission();
+    if (!galleryPermissionGranted) {
+      const result = await Permissions.requestGalleryPermission();
+      if (!result) return;
+    }
     if (!viewShotRef.current) {
       throw new Error('ViewShot ref is not available');
     }
@@ -31,7 +37,7 @@ export const saveImageToGallery = async viewShotRef => {
     });
 
     ToastAndroid.show('Image saved to gallery', ToastAndroid.SHORT);
-    return true;
+    return uri;
   } catch (error) {
     console.error('Error saving image:', error);
     ToastAndroid.show(

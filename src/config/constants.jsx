@@ -31,25 +31,11 @@ const screen = {
   height,
 };
 
-const api = {
-  baseUrl: 'https://api.example.com',
-  endpoints: {
-    login: '/auth/login',
-    register: '/auth/register',
-    getUser: '/user',
-  },
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
-};
-
 const constants = {
   fontSizes,
   colors,
   fontFamilies,
   screen,
-  api,
 };
 
 export default constants;

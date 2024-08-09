@@ -15,6 +15,7 @@ import Footer from '../components/Footer';
 import constants from '../config/constants';
 const {width, height} = constants.screen;
 import {saveImageToGallery} from '../utils/imageSaver';
+import {useNavigation} from '@react-navigation/native';
 
 const Home = ({route}) => {
   const viewShotRef = useRef(null);
@@ -29,7 +30,7 @@ const Home = ({route}) => {
   const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
   const [hasTransitioned, setHasTransitioned] = useState(false);
   const transitionValue = useRef(new Animated.Value(0)).current;
-
+  const navigation = useNavigation();
   useEffect(() => {
     if (!hasTransitioned) {
       // Delay the start of the animation
@@ -68,9 +69,10 @@ const Home = ({route}) => {
   }, [originalImage]);
 
   const handleSaveImage = async () => {
-    const success = await saveImageToGallery(viewShotRef);
-    if (success) {
+    const uri = await saveImageToGallery(viewShotRef);
+    if (uri) {
       setIsModalVisible(false);
+      navigation.navigate('ShareToSocial', {processedImage: uri});
     }
   };
 

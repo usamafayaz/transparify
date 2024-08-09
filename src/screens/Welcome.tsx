@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import constants from '../config/constants';
@@ -24,7 +24,12 @@ const Welcome = () => {
       <TouchableOpacity
         style={styles.buttonContainer}
         onPress={() => {
-          navigation.navigate('Image Upload' as never);
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name: 'Image Upload'}],
+            }),
+          );
         }}>
         <Text style={styles.buttonText} allowFontScaling={false}>
           Get Started

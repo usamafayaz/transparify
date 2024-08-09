@@ -1,5 +1,5 @@
 import {ToastAndroid} from 'react-native';
-
+import apiUrl from '../config/apiUrl';
 export const removeBackground = async (uri, setIsLoading, navigation) => {
   setIsLoading(true);
   const formData = new FormData();
@@ -12,7 +12,7 @@ export const removeBackground = async (uri, setIsLoading, navigation) => {
   formData.append('model', 'v1');
 
   try {
-    const response = await fetch('https://api2.pixelcut.app/image/matte/v1', {
+    const response = await fetch(apiUrl.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'multipart/form-data',

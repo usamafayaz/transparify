@@ -6,7 +6,6 @@ import {
   Modal,
   StyleSheet,
   TouchableWithoutFeedback,
-  ActivityIndicator,
 } from 'react-native';
 import ColorPicker from 'react-native-wheel-color-picker';
 
@@ -43,9 +42,9 @@ const ColorPickerModal = ({visible, onCancel, onColorSelected}) => {
                   sliderSize={0}
                   noSnap={true}
                   row={false}
-                  swatchesLast={false}
-                  swatches={true}
-                  discrete={false}
+                  swatchesLast={true}
+                  swatches={false}
+                  discrete={true}
                   useNativeDriver={true}
                 />
               </View>

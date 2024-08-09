@@ -35,14 +35,6 @@ const basicColors = [
 const gradientColors = [
   ['#FF0000', '#FFFF00'], // Red to Yellow
   ['#FF0000', '#FF00FF'], // Red to Purple
-  ['#FF0000', '#00FF00'], // Red to Green
-  ['#FF0000', '#0000FF'], // Red to Blue
-  ['#FFFF00', '#00FF00'], // Yellow to Green
-  ['#FFFF00', '#0000FF'], // Yellow to Blue
-  ['#00FF00', '#0000FF'], // Green to Blue
-  ['#FF00FF', '#0000FF'], // Purple to Blue
-  ['#FF0000', '#FFFFFF'], // Red to White
-  ['#FFFF00', '#FFFFFF'], // Yellow to White
   ['#00FF00', '#FFFFFF'], // Green to White
   ['#0000FF', '#FFFFFF'], // Blue to White
   ['#800000', '#FF0000'], // Dark Red to Red
@@ -62,6 +54,14 @@ const gradientColors = [
   ['#40E0D0', '#FF8C00'], // Turquoise to Orange
   ['#FF69B4', '#FFD700'], // Pink to Gold
   ['#008080', '#FF00FF'], // Teal to Purple
+  ['#FF0000', '#0000FF'], // Red to Blue
+  ['#FFFF00', '#00FF00'], // Yellow to Green
+  ['#FFFF00', '#0000FF'], // Yellow to Blue
+  ['#00FF00', '#0000FF'], // Green to Blue
+  ['#FF00FF', '#0000FF'], // Purple to Blue
+  ['#FF0000', '#FFFFFF'], // Red to White
+  ['#FFFF00', '#FFFFFF'], // Yellow to White
+  ['#FF0000', '#00FF00'], // Red to Green
 ];
 
 export {basicColors, gradientColors};

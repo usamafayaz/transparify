@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Image,
   StyleSheet,
@@ -11,10 +11,30 @@ import {useNavigation} from '@react-navigation/native';
 import constants from '../config/constants';
 import {openCamera, openImagePicker} from '../utils/imagePicker';
 import {removeBackground} from '../utils/removeBackgroundAPI';
+import Permissions from '../utils/permissions';
 
 const {height, width} = constants.screen;
 
 const ImageUpload = () => {
+  useEffect(() => {
+    const checkPermissions = async () => {
+      const cameraPermissionGranted = await Permissions.checkCameraPermission();
+      const galleryPermissionGranted =
+        await Permissions.checkGalleryPermission();
+
+      if (!cameraPermissionGranted) {
+        await Permissions.requestCameraPermission();
+      }
+
+      if (!galleryPermissionGranted) {
+        await Permissions.requestGalleryPermission();
+      }
+    };
+    setTimeout(() => {
+      checkPermissions();
+    }, 500);
+  }, []);
+
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
