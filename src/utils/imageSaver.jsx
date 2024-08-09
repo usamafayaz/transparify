@@ -1,6 +1,6 @@
 import RNFS from 'react-native-fs';
-import {CameraRoll} from '@react-native-camera-roll/camera-roll';
-import {ToastAndroid} from 'react-native';
+import { CameraRoll } from '@react-native-camera-roll/camera-roll';
+import { ToastAndroid } from 'react-native';
 import Permissions from './permissions';
 
 export const saveImageToGallery = async viewShotRef => {
