@@ -82,6 +82,10 @@ const Home = ({ route }) => {
       type = "image";
       background = selectedBackgroundImage
     }
+    else {
+      type = "nobackground";
+      background = "";
+    }
     saveImageToGallery(processedImage, background, type)
       .then((result => {
         console.log("what is the result =====>", result)
