@@ -1,4 +1,4 @@
-import {PermissionsAndroid, Platform, Alert, Linking} from 'react-native';
+import { PermissionsAndroid, Platform, Alert, Linking } from 'react-native';
 
 const checkCameraPermission = async () => {
   if (Platform.OS === 'android') {
@@ -15,6 +15,7 @@ const checkCameraPermission = async () => {
   return true;
 };
 
+
 const checkGalleryPermission = async () => {
   if (Platform.OS === 'android') {
     try {
@@ -24,6 +25,21 @@ const checkGalleryPermission = async () => {
       return granted;
     } catch (error) {
       console.error('Error checking gallery permission:', error);
+      return false;
+    }
+  }
+  return true;
+};
+
+const checkWritePermission = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      return granted;
+    } catch (error) {
+      console.error('Error checking writing permission:', error);
       return false;
     }
   }
@@ -78,6 +94,30 @@ const requestGalleryPermission = async () => {
   return true;
 };
 
+const requestWritePermission = async () => {
+  if (Platform.OS === 'android') {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Gallery permission granted');
+        return true;
+      } else if (granted === PermissionsAndroid.RESULTS.DENIED) {
+        console.log('Gallery permission denied');
+      } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+        console.log('Gallery permission blocked');
+        showPermissionAlert('Gallery');
+      }
+      return false;
+    } catch (error) {
+      console.error('Error requesting gallery permission:', error);
+      return false;
+    }
+  }
+  return true;
+};
+
 const showPermissionAlert = permissionType => {
   Alert.alert(
     `${permissionType} Permission Required`,
@@ -92,7 +132,7 @@ const showPermissionAlert = permissionType => {
         onPress: () => Linking.openSettings(),
       },
     ],
-    {cancelable: false},
+    { cancelable: false },
   );
 };
 
@@ -101,6 +141,8 @@ const Permissions = {
   checkGalleryPermission,
   requestCameraPermission,
   requestGalleryPermission,
+  checkWritePermission,
+  requestWritePermission,
 };
 
 export default Permissions;

@@ -1,49 +1,53 @@
 import RNFS from 'react-native-fs';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
-import { ToastAndroid } from 'react-native';
+import { Platform, ToastAndroid } from 'react-native';
+import { NativeModules } from 'react-native';
 import Permissions from './permissions';
 
-export const saveImageToGallery = async viewShotRef => {
-  try {
-    const galleryPermissionGranted = await Permissions.checkGalleryPermission();
-    if (!galleryPermissionGranted) {
-      const result = await Permissions.requestGalleryPermission();
-      if (!result) return;
+const { TransparifyHelper } = NativeModules;
+
+export const saveImageToGallery = (processedImage, background, backgroundType) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const writePermissionGranted = await Permissions.checkWritePermission();
+      if (!writePermissionGranted) {
+        const result = await Permissions.requestWritePermission();
+        if (!result) return false;
+      }
+      const base64Image = processedImage.split(',')[1]
+
+      let colorData;
+      if (backgroundType === "color") {
+        backgroundData = { type: 'color', color: '#FF0000' }
+      } else if (backgroundType === "gradient") {
+        backgroundData = { type: 'gradient', gradient: { startColor: background[0], endColor: background[1] } }
+      } else if (backgroundType === "image") {
+        backgroundData = { type: 'image', uri: background }
+      }
+      console.log("what is the background and type=====>", background, backgroundType);
+
+      TransparifyHelper.mergeImageWithBackground(base64Image, backgroundData).
+        then(async (res) => {
+          const directoryPath = `${RNFS.PicturesDirectoryPath}`;
+          const savePath = `${RNFS.PicturesDirectoryPath}/${new Date().getTime()}.png`;
+          const exists = await RNFS.exists(directoryPath)
+
+          if (!exists) {
+            await RNFS.mkdir(directoryPath);
+            console.log("directory created");
+          }
+
+          await RNFS.copyFile(res, savePath);
+          await RNFS.scanFile(savePath);
+
+          resolve(true)
+
+        }).catch((error) => {
+          console.log("what is the error during merge ====>", error)
+          reject(error)
+        })
+    } catch (error) {
+      reject(error);
     }
-    if (!viewShotRef.current) {
-      throw new Error('ViewShot ref is not available');
-    }
-
-    const uri = await viewShotRef.current.capture({
-      quality: 1,
-      format: 'png',
-      result: 'tmpfile',
-    });
-
-    if (!uri) {
-      throw new Error('Failed to capture screenshot');
-    }
-
-    const fileName = `transparify_${Date.now()}.png`;
-    const directory = `${RNFS.PicturesDirectoryPath}/Transparify`;
-    await RNFS.mkdir(directory);
-
-    const newPath = `${directory}/${fileName}`;
-    await RNFS.copyFile(uri, newPath);
-
-    await CameraRoll.saveAsset(`file://${newPath}`, {
-      type: 'photo',
-      album: 'Transparify',
-    });
-
-    ToastAndroid.show('Image saved to gallery', ToastAndroid.SHORT);
-    return uri;
-  } catch (error) {
-    console.error('Error saving image:', error);
-    ToastAndroid.show(
-      'Error: Failed to save image. Please try again.',
-      ToastAndroid.SHORT,
-    );
-    return false;
-  }
+  });
 };

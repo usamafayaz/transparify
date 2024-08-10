@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   Image,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Animated,
+  ToastAndroid,
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import LinearGradient from 'react-native-linear-gradient';
@@ -13,13 +14,13 @@ import ToggleButtons from '../components/ToggleButtons';
 import SaveModal from '../components/SaveModal';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
-const {width, height} = constants.screen;
-import {saveImageToGallery} from '../utils/imageSaver';
-import {useNavigation} from '@react-navigation/native';
+const { width, height } = constants.screen;
+import { saveImageToGallery } from '../utils/imageSaver';
+import { useNavigation } from '@react-navigation/native';
 
-const Home = ({route}) => {
+const Home = ({ route }) => {
   const viewShotRef = useRef(null);
-  const {originalImage, processedImage} = route.params;
+  const { originalImage, processedImage } = route.params;
   const [activeTab, setActiveTab] = useState('Removed');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [footerState, setFooterState] = useState('initial');
@@ -27,23 +28,22 @@ const Home = ({route}) => {
   const [backgroundColor, setBackgroundColor] = useState(null);
   const [selectedGradient, setSelectedGradient] = useState(null);
   const [selectedBackgroundImage, setSelectedBackgroundImage] = useState(null);
-  const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [hasTransitioned, setHasTransitioned] = useState(false);
   const transitionValue = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
   useEffect(() => {
     if (!hasTransitioned) {
-      // Delay the start of the animation
       setTimeout(() => {
         Animated.timing(transitionValue, {
           toValue: 1,
           duration: 1500,
-          useNativeDriver: false, // We need to set this to false for layout animations
+          useNativeDriver: false,
         }).start(() => {
           setHasTransitioned(true);
           setActiveTab('Removed');
         });
-      }, 250); // 0.1 second delay before the transition starts
+      }, 250);
     }
   }, [hasTransitioned, transitionValue]);
 
@@ -59,8 +59,7 @@ const Home = ({route}) => {
           newHeight = height * 0.6;
           newWidth = newHeight * aspectRatio;
         }
-
-        setImageDimensions({width: newWidth, height: newHeight});
+        setImageDimensions({ width: newWidth, height: newHeight });
       },
       error => {
         console.error('Error getting image size:', error);
@@ -69,11 +68,30 @@ const Home = ({route}) => {
   }, [originalImage]);
 
   const handleSaveImage = async () => {
-    const uri = await saveImageToGallery(viewShotRef);
-    if (uri) {
-      setIsModalVisible(false);
-      navigation.navigate('ShareToSocial', {processedImage: uri});
+    let background = "";
+    let type = "";
+    if (selectedGradient) {
+      type = "gradient";
+      background = selectedGradient;
     }
+    else if (backgroundColor) {
+      type = "color";
+      background = backgroundColor;
+    }
+    else if (selectedBackgroundImage) {
+      type = "image";
+      background = selectedBackgroundImage
+    }
+    saveImageToGallery(processedImage, background, type)
+      .then((result => {
+        console.log("what is the result =====>", result)
+        if (result) {
+          ToastAndroid.show('Image saved to gallery', ToastAndroid.SHORT);
+          setIsModalVisible(false);
+          //navigation.navigate('ShareToSocial', { processedImage: uri });
+        }
+      }))
+      .catch((error) => { console.log("what is the error during saving ========>", error) })
   };
 
   const selectGalleryImage = useCallback(uri => {
@@ -108,7 +126,7 @@ const Home = ({route}) => {
           colors={selectedGradient}
           style={[styles.backgroundContainer, imageDimensions]}>
           <Image
-            source={{uri: processedImage}}
+            source={{ uri: processedImage }}
             style={styles.processedImage}
             resizeMode="contain"
           />
@@ -118,12 +136,12 @@ const Home = ({route}) => {
       return (
         <View style={[styles.backgroundContainer, imageDimensions]}>
           <Image
-            source={{uri: selectedBackgroundImage}}
+            source={{ uri: selectedBackgroundImage }}
             style={StyleSheet.absoluteFill}
             resizeMode="cover"
           />
           <Image
-            source={{uri: processedImage}}
+            source={{ uri: processedImage }}
             style={styles.processedImage}
             resizeMode="contain"
           />
@@ -135,10 +153,10 @@ const Home = ({route}) => {
           style={[
             styles.backgroundContainer,
             imageDimensions,
-            {backgroundColor},
+            { backgroundColor },
           ]}>
           <Image
-            source={{uri: processedImage}}
+            source={{ uri: processedImage }}
             style={styles.processedImage}
             resizeMode="contain"
           />
@@ -174,15 +192,15 @@ const Home = ({route}) => {
         <View style={styles.imageContainer}>
           <ViewShot
             ref={viewShotRef}
-            options={{...imageDimensions, quality: 1, format: 'png'}}
+            options={{ ...imageDimensions, quality: 1, format: 'png' }}
             style={[styles.image, imageDimensions]}>
             {!backgroundColor &&
-            !selectedGradient &&
-            !selectedBackgroundImage &&
-            activeTab !== 'Original' ? (
+              !selectedGradient &&
+              !selectedBackgroundImage &&
+              activeTab !== 'Original' ? (
               <View style={[styles.image, imageDimensions]}>
                 <Image
-                  source={{uri: originalImage}}
+                  source={{ uri: originalImage }}
                   style={[styles.image, imageDimensions]}
                   resizeMode="contain"
                 />
@@ -204,7 +222,7 @@ const Home = ({route}) => {
                       style={[styles.checkeredBackground, imageDimensions]}
                     />
                     <Image
-                      source={{uri: processedImage}}
+                      source={{ uri: processedImage }}
                       style={[
                         styles.image,
                         imageDimensions,
@@ -222,7 +240,7 @@ const Home = ({route}) => {
               </View>
             ) : activeTab === 'Original' ? (
               <Image
-                source={{uri: originalImage}}
+                source={{ uri: originalImage }}
                 style={[styles.image, imageDimensions]}
                 resizeMode="contain"
               />
