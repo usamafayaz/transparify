@@ -42,7 +42,7 @@ const Welcome = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: constants.colors.white,
+    backgroundColor: constants.colors.backgroundColor,
     alignItems: 'center',
     paddingHorizontal: width * 0.07,
     justifyContent: 'center',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    color: constants.colors.white,
+    color: constants.colors.backgroundColor,
     fontSize: constants.fontSizes.medium,
     fontWeight: 'bold',
   },

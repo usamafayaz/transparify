@@ -1,7 +1,15 @@
-import { CommonActions, useNavigation } from '@react-navigation/native';
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Image, Animated } from 'react-native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
+import React, {useEffect, useRef} from 'react';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Animated,
+  StatusBar,
+  Appearance,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import constants from '../config/constants';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -26,14 +34,14 @@ const SplashScreen = () => {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{ name: 'Welcome' }],
+              routes: [{name: 'Welcome'}],
             }),
           );
         } else {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
-              routes: [{ name: 'Image Upload' }],
+              routes: [{name: 'Image Upload'}],
             }),
           );
         }
@@ -47,6 +55,10 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        backgroundColor={constants.colors.backgroundColor}
+        barStyle={'dark-content'}
+      />
       <Image
         source={require('../assets/images/logo.png')}
         style={styles.logo}
@@ -74,7 +86,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: constants.colors.backgroundColor,
   },
   logo: {
     height: '10%',
@@ -91,7 +103,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: '100%',
-    backgroundColor: '#202455',
+    backgroundColor: constants.colors.backgroundColor,
   },
 });
 

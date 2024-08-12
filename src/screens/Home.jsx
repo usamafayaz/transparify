@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
 import {
   Image,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   ToastAndroid,
+  BackHandler,
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,13 +15,15 @@ import ToggleButtons from '../components/ToggleButtons';
 import SaveModal from '../components/SaveModal';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
-const { width, height } = constants.screen;
-import { saveImageToGallery } from '../utils/imageSaver';
-import { useNavigation } from '@react-navigation/native';
+const {width, height} = constants.screen;
+import {saveImageToGallery} from '../utils/imageSaver';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import DiscardChangesModal from '../components/DiscardChangesModal';
 
-const Home = ({ route }) => {
+const Home = ({route}) => {
+  const navigation = useNavigation();
   const viewShotRef = useRef(null);
-  const { originalImage, processedImage } = route.params;
+  const {originalImage, processedImage} = route.params;
   const [activeTab, setActiveTab] = useState('Removed');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [footerState, setFooterState] = useState('initial');
@@ -28,10 +31,11 @@ const Home = ({ route }) => {
   const [backgroundColor, setBackgroundColor] = useState(null);
   const [selectedGradient, setSelectedGradient] = useState(null);
   const [selectedBackgroundImage, setSelectedBackgroundImage] = useState(null);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
   const [hasTransitioned, setHasTransitioned] = useState(false);
   const transitionValue = useRef(new Animated.Value(0)).current;
-  const navigation = useNavigation();
+  const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false); // State for discard modal
+
   useEffect(() => {
     if (!hasTransitioned) {
       setTimeout(() => {
@@ -59,43 +63,49 @@ const Home = ({ route }) => {
           newHeight = height * 0.6;
           newWidth = newHeight * aspectRatio;
         }
-        setImageDimensions({ width: newWidth, height: newHeight });
+        setImageDimensions({width: newWidth, height: newHeight});
       },
       error => {
         console.error('Error getting image size:', error);
       },
     );
   }, [originalImage]);
-
-  const handleSaveImage = async () => {
-    let background = "";
-    let type = "";
+  const clearBackground = () => {
+    console.log('clearing everything');
+    setBackgroundColor(null);
+    setSelectedGradient(null);
+    setSelectedBackgroundImage(null);
+  };
+  const handleShareImage = async () => {
+    let background = '';
+    let type = '';
     if (selectedGradient) {
-      type = "gradient";
+      type = 'gradient';
       background = selectedGradient;
-    }
-    else if (backgroundColor) {
-      type = "color";
+    } else if (backgroundColor) {
+      type = 'color';
       background = backgroundColor;
+    } else if (selectedBackgroundImage) {
+      type = 'image';
+      background = selectedBackgroundImage;
+    } else {
+      type = 'nobackground';
+      background = '';
     }
-    else if (selectedBackgroundImage) {
-      type = "image";
-      background = selectedBackgroundImage
-    }
-    else {
-      type = "nobackground";
-      background = "";
-    }
-    saveImageToGallery(processedImage, background, type)
-      .then((result => {
-        console.log("what is the result =====>", result)
+    saveImageToGallery(processedImage, background, type, navigation)
+      .then(result => {
+        console.log('what is the result =====>', result);
         if (result) {
           ToastAndroid.show('Image saved to gallery', ToastAndroid.SHORT);
           setIsModalVisible(false);
-          //navigation.navigate('ShareToSocial', { processedImage: uri });
+          navigation.navigate('ShareToSocial', {
+            processedImage: result,
+          });
         }
-      }))
-      .catch((error) => { console.log("what is the error during saving ========>", error) })
+      })
+      .catch(error => {
+        console.log('what is the error during saving ========>', error);
+      });
   };
 
   const selectGalleryImage = useCallback(uri => {
@@ -122,6 +132,26 @@ const Home = ({ route }) => {
     },
     [backgroundColor, selectedGradient],
   );
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        setIsDiscardModalVisible(true);
+        return true; // Prevents the default back action
+      };
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+
+      // Clean up the event listener when the screen is unfocused or unmounted
+      return () => backHandler.remove();
+    }, []),
+  );
+  const handleDiscard = () => {
+    clearBackground();
+    setIsDiscardModalVisible(false);
+    navigation.goBack();
+  };
 
   const renderBackground = useMemo(() => {
     if (selectedGradient) {
@@ -130,7 +160,7 @@ const Home = ({ route }) => {
           colors={selectedGradient}
           style={[styles.backgroundContainer, imageDimensions]}>
           <Image
-            source={{ uri: processedImage }}
+            source={{uri: processedImage}}
             style={styles.processedImage}
             resizeMode="contain"
           />
@@ -140,12 +170,12 @@ const Home = ({ route }) => {
       return (
         <View style={[styles.backgroundContainer, imageDimensions]}>
           <Image
-            source={{ uri: selectedBackgroundImage }}
+            source={{uri: selectedBackgroundImage}}
             style={StyleSheet.absoluteFill}
             resizeMode="cover"
           />
           <Image
-            source={{ uri: processedImage }}
+            source={{uri: processedImage}}
             style={styles.processedImage}
             resizeMode="contain"
           />
@@ -157,10 +187,10 @@ const Home = ({ route }) => {
           style={[
             styles.backgroundContainer,
             imageDimensions,
-            { backgroundColor },
+            {backgroundColor},
           ]}>
           <Image
-            source={{ uri: processedImage }}
+            source={{uri: processedImage}}
             style={styles.processedImage}
             resizeMode="contain"
           />
@@ -178,15 +208,28 @@ const Home = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.topBarText} allowFontScaling={false}>
-          Transparify
-        </Text>
+        <View style={styles.leftHalfTopBar}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsDiscardModalVisible(true);
+            }}>
+            <Image
+              resizeMode="contain"
+              source={require('../assets/icons/left_arrow.png')}
+              style={styles.iconStyle}
+              tintColor={constants.colors.iconsColor}
+            />
+          </TouchableOpacity>
+          <Text style={styles.topBarText} allowFontScaling={false}>
+            Transparify
+          </Text>
+        </View>
         {activeTab !== 'Original' && (
           <TouchableOpacity
             style={styles.saveButton}
             onPress={() => setIsModalVisible(true)}>
             <Text style={styles.saveButtonText} allowFontScaling={false}>
-              Save
+              Share
             </Text>
           </TouchableOpacity>
         )}
@@ -196,15 +239,15 @@ const Home = ({ route }) => {
         <View style={styles.imageContainer}>
           <ViewShot
             ref={viewShotRef}
-            options={{ ...imageDimensions, quality: 1, format: 'png' }}
+            options={{...imageDimensions, quality: 1, format: 'png'}}
             style={[styles.image, imageDimensions]}>
             {!backgroundColor &&
-              !selectedGradient &&
-              !selectedBackgroundImage &&
-              activeTab !== 'Original' ? (
+            !selectedGradient &&
+            !selectedBackgroundImage &&
+            activeTab !== 'Original' ? (
               <View style={[styles.image, imageDimensions]}>
                 <Image
-                  source={{ uri: originalImage }}
+                  source={{uri: originalImage}}
                   style={[styles.image, imageDimensions]}
                   resizeMode="contain"
                 />
@@ -226,7 +269,7 @@ const Home = ({ route }) => {
                       style={[styles.checkeredBackground, imageDimensions]}
                     />
                     <Image
-                      source={{ uri: processedImage }}
+                      source={{uri: processedImage}}
                       style={[
                         styles.image,
                         imageDimensions,
@@ -244,7 +287,7 @@ const Home = ({ route }) => {
               </View>
             ) : activeTab === 'Original' ? (
               <Image
-                source={{ uri: originalImage }}
+                source={{uri: originalImage}}
                 style={[styles.image, imageDimensions]}
                 resizeMode="contain"
               />
@@ -261,12 +304,18 @@ const Home = ({ route }) => {
           setColorState={setColorState}
           handleColorSelect={handleColorSelect}
           selectGalleryImage={selectGalleryImage}
+          clearBackground={clearBackground}
         />
       </View>
       <SaveModal
-        onNormal={handleSaveImage}
+        onNormal={handleShareImage}
         visible={isModalVisible}
         onClose={() => setIsModalVisible(!isModalVisible)}
+      />
+      <DiscardChangesModal
+        visible={isDiscardModalVisible}
+        onClose={() => setIsDiscardModalVisible(false)}
+        onDiscard={handleDiscard}
       />
     </View>
   );
@@ -275,18 +324,23 @@ const Home = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: constants.colors.white,
+    backgroundColor: constants.colors.backgroundColor,
   },
   topBar: {
     height: height * 0.1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: width * 0.05,
+  },
+  leftHalfTopBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   topBarText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
+    marginLeft: width * 0.05,
     color: constants.colors.textSecondary,
   },
   saveButton: {
@@ -295,8 +349,9 @@ const styles = StyleSheet.create({
     paddingVertical: height * 0.01,
     paddingHorizontal: width * 0.05,
   },
+
   saveButtonText: {
-    color: constants.colors.white,
+    color: constants.colors.textPrimary,
     fontSize: constants.fontSizes.small,
   },
   contentContainer: {
@@ -308,10 +363,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
+    borderRadius: 7,
   },
   image: {
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 7,
+    overflow: 'hidden',
   },
   backgroundContainer: {
     justifyContent: 'center',
@@ -327,6 +385,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+  },
+  iconStyle: {
+    height: height * 0.08,
+    width: width * 0.08,
+    resizeMode: 'contain',
   },
 });
 export default Home;

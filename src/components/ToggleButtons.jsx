@@ -43,7 +43,7 @@ const ToggleButtons = ({activeTab, setActiveTab}) => {
         <Text
           style={[
             styles.toggleButtonText,
-            activeTab === 'Original' && {color: '#000000'},
+            activeTab === 'Original' && {color: constants.colors.textPrimary},
           ]}
           allowFontScaling={false}>
           Original
@@ -55,7 +55,7 @@ const ToggleButtons = ({activeTab, setActiveTab}) => {
         <Text
           style={[
             styles.toggleButtonText,
-            activeTab === 'Removed' && {color: '#000000'},
+            activeTab === 'Removed' && {color: constants.colors.textPrimary},
           ]}
           allowFontScaling={false}>
           Removed
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   toggleContainer: {
     width: width * 0.9,
     height: height * 0.06,
-    backgroundColor: constants.colors.secondary,
+    backgroundColor: constants.colors.buttonBackground,
     flexDirection: 'row',
     borderRadius: width * 0.4,
     paddingHorizontal: '1%',
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '50%',
     height: '100%',
-    backgroundColor: constants.colors.white,
+    backgroundColor: constants.colors.activeToggleButtonColor,
     borderRadius: width * 0.4,
     shadowColor: constants.colors.black,
     elevation: 5,

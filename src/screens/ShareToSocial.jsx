@@ -62,10 +62,20 @@ const ShareToSocial = ({route}) => {
         <Text style={styles.topBarText} allowFontScaling={false}>
           Transparify
         </Text>
+        <TouchableOpacity onPress={() => handleShare('Share')}>
+          <Image
+            source={require('../assets/icons/invite.png')}
+            style={styles.inviteStyle}
+            tintColor={constants.colors.iconsColor}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.imageContainer}>
-          <Image source={{uri: processedImage}} style={styles.processedImage} />
+          <Image
+            source={{uri: `file:///${processedImage}`}}
+            style={styles.processedImage}
+          />
         </View>
         <Text
           style={[styles.topBarText, {fontWeight: '500', marginTop: 20}]}
@@ -93,6 +103,7 @@ const ShareToSocial = ({route}) => {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handleShare('Share')}>
             <Image
+              tintColor={constants.colors.iconsColor}
               source={require('../assets/icons/share.png')}
               style={styles.iconStyle}
             />
@@ -106,7 +117,7 @@ const ShareToSocial = ({route}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: constants.colors.white,
+    backgroundColor: constants.colors.backgroundColor,
   },
   topBar: {
     height: height * 0.1,
@@ -114,6 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: width * 0.05,
+    marginTop: height * 0.01,
   },
   topBarText: {
     fontSize: width * 0.06,
@@ -121,29 +133,37 @@ const styles = StyleSheet.create({
     color: constants.colors.textSecondary,
   },
   contentContainer: {
-    flex: 1,
     alignItems: 'center',
     marginTop: height * 0.1,
+    borderRadius: 37,
   },
   imageContainer: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 30,
   },
   processedImage: {
     width: '100%',
     height: height * 0.5,
     resizeMode: 'contain',
+    overflow: 'hidden',
   },
   iconRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginTop: 20,
+    marginTop: 10,
     width: '60%',
   },
   iconStyle: {
-    height: height * 0.12,
-    width: width * 0.12,
+    height: height * 0.1,
+    width: width * 0.1,
+    resizeMode: 'contain',
+  },
+  inviteStyle: {
+    height: height * 0.07,
+    width: width * 0.07,
+    marginRight: width * 0.01,
     resizeMode: 'contain',
   },
 });

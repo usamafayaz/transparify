@@ -6,19 +6,24 @@ import Welcome from './src/screens/Welcome';
 import ImageUpload from './src/screens/ImageUpload';
 import Home from './src/screens/Home';
 import ShareToSocial from './src/screens/ShareToSocial';
+import {StatusBar} from 'react-native';
+import constants from './src/config/constants';
 
 const Stack = createStackNavigator();
 const App = () => {
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="SplashScreen" component={SplashScreen} />
-        <Stack.Screen name="Welcome" component={Welcome} />
-        <Stack.Screen name="Image Upload" component={ImageUpload} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ShareToSocial" component={ShareToSocial} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar backgroundColor={constants.colors.backgroundColor} />
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen name="SplashScreen" component={SplashScreen} />
+          <Stack.Screen name="Welcome" component={Welcome} />
+          <Stack.Screen name="Image Upload" component={ImageUpload} />
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="ShareToSocial" component={ShareToSocial} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 };
 

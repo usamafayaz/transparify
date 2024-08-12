@@ -25,6 +25,7 @@ const Footer = ({
   setColorState,
   handleColorSelect,
   selectGalleryImage,
+  clearBackground,
 }) => {
   const [colorModal, setColorModal] = useState(false);
 
@@ -79,6 +80,19 @@ const Footer = ({
             />
             <Text style={styles.footerButtonText} allowFontScaling={false}>
               Image
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => {
+              clearBackground();
+            }}>
+            <Image
+              source={require('../assets/icons/transparency.png')}
+              style={styles.footerIcon}
+            />
+            <Text style={styles.footerButtonText} allowFontScaling={false}>
+              Clear
             </Text>
           </TouchableOpacity>
         </View>
@@ -172,7 +186,7 @@ const styles = StyleSheet.create({
   footerContainer: {
     width: '100%',
     alignItems: 'center',
-    backgroundColor: constants.colors.white,
+    backgroundColor: constants.colors.backgroundColor,
     paddingBottom: height * 0.03,
   },
   footerText: {
@@ -186,7 +200,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.02,
   },
   footerButton: {
-    backgroundColor: constants.colors.secondary,
+    backgroundColor: constants.colors.buttonBackground,
     height: width * 0.17,
     width: width * 0.17,
     justifyContent: 'center',
@@ -202,7 +216,7 @@ const styles = StyleSheet.create({
   footerButtonText: {
     fontSize: constants.fontSizes.xsmall,
     fontWeight: '500',
-    color: constants.colors.black,
+    color: constants.colors.textPrimary,
   },
 });
 

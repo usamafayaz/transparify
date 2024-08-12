@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Image,
   StyleSheet,
@@ -6,22 +6,50 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  StatusBar,
+  BackHandler,
+  ToastAndroid,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import constants from '../config/constants';
-import { openCamera, openImagePicker } from '../utils/imagePicker';
-import { removeBackground } from '../utils/removeBackgroundAPI';
+import {openCamera, openImagePicker} from '../utils/imagePicker';
+import {removeBackground} from '../utils/removeBackgroundAPI';
 
-const { height, width } = constants.screen;
+const {height, width} = constants.screen;
 
 const ImageUpload = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [backPressCount, setBackPressCount] = useState(0);
   const navigation = useNavigation();
 
   const handleImagePicked = uri => {
     removeBackground(uri, setIsLoading, navigation);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backAction = () => {
+        if (backPressCount === 0) {
+          setBackPressCount(1);
+          ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+
+          setTimeout(() => {
+            setBackPressCount(0);
+          }, 2000); // Reset the counter after 2 seconds
+
+          return true; // Prevent default behavior of back button
+        } else {
+          BackHandler.exitApp(); // Exit the app if back button is pressed again
+        }
+      };
+
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        backAction,
+      );
+
+      return () => backHandler.remove(); // Clean up the back handler when the screen is unfocused
+    }, [backPressCount]),
+  );
 
   return (
     <View style={styles.container}>
@@ -60,12 +88,9 @@ const ImageUpload = () => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={constants.colors.primary} />
           <Text
-            style={[styles.loadingText, { fontSize: 18 }]}
+            style={[styles.loadingText, {fontSize: 18}]}
             allowFontScaling={false}>
             Processing
-          </Text>
-          <Text style={styles.loadingText} allowFontScaling={false}>
-            Please wait
           </Text>
         </View>
       )}
@@ -76,7 +101,7 @@ const ImageUpload = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: constants.colors.white,
+    backgroundColor: constants.colors.backgroundColor,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -98,7 +123,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: width * 0.85,
-    backgroundColor: constants.colors.secondary,
+    backgroundColor: constants.colors.buttonBackground,
     borderRadius: 40,
     paddingVertical: height * 0.013,
     marginVertical: height * 0.012,
@@ -109,7 +134,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   buttonText: {
-    color: constants.colors.black,
+    color: constants.colors.textSecondary,
     fontSize: constants.fontSizes.medium,
     fontWeight: '600',
     marginLeft: width * 0.02,

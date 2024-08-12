@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
   },
   modalTitle: {
-    color: constants.colors.white,
+    color: constants.colors.backgroundColor,
     fontSize: constants.fontSizes.medium + 2,
     fontWeight: 'bold',
     marginBottom: 10,
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: constants.colors.secondary,
+    backgroundColor: constants.colors.buttonBackground,
     paddingVertical: height * 0.012,
     paddingHorizontal: width * 0.05,
     borderRadius: 20,

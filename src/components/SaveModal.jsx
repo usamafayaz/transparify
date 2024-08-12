@@ -66,20 +66,20 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '80%',
-    backgroundColor: 'white',
+    backgroundColor: constants.colors.backgroundColor,
     borderRadius: 10,
     padding: height * 0.025,
     alignItems: 'center',
   },
   modalTitle: {
-    color: constants.colors.textSecondary,
+    color: constants.colors.textPrimary,
     fontSize: constants.fontSizes.medium + 2,
     fontWeight: 'bold',
     marginBottom: height * 0.02,
   },
   modalButton: {
     width: '100%',
-    backgroundColor: constants.colors.primary,
+    backgroundColor: constants.colors.buttonBackground,
     borderRadius: 20,
     paddingVertical: height * 0.012,
     marginVertical: height * 0.012,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     borderColor: constants.colors.primary,
   },
   modalButtonText: {
-    color: constants.colors.white,
+    color: constants.colors.textPrimary,
     fontSize: constants.fontSizes.small,
   },
   crownIcon: {
