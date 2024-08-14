@@ -1,4 +1,4 @@
-import { ToastAndroid } from 'react-native';
+import {ToastAndroid} from 'react-native';
 import apiUrl from '../config/apiUrl';
 export const removeBackground = async (uri, setIsLoading, navigation) => {
   setIsLoading(true);

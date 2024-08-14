@@ -1,10 +1,41 @@
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Permissions from './permissions';
+import {Alert} from 'react-native';
 
 const options = {
   mediaType: 'photo',
   quality: 1,
   includeBase64: false,
+};
+
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
+
+const showSizeExceededAlert = () => {
+  Alert.alert(
+    'Image size exceeded',
+    'Please select an image smaller than 10 MB.',
+    [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+  );
+};
+
+const handleImagePicked = (response, callback) => {
+  if (!response) {
+    console.log('Invalid response from image picker');
+    return;
+  }
+  if (response.didCancel) return;
+  if (response.assets) {
+    const asset = response.assets[0];
+    const uri = asset.uri;
+    const fileSize = asset.fileSize;
+
+    if (fileSize > MAX_IMAGE_SIZE) {
+      showSizeExceededAlert();
+      return;
+    }
+
+    callback(uri);
+  }
 };
 
 const openGallery = async callback => {
@@ -14,17 +45,9 @@ const openGallery = async callback => {
     if (!result) return;
   }
 
-  launchImageLibrary(options, response => {
-    if (!response) {
-      console.log('Invalid response from image picker');
-      return;
-    }
-    if (response.didCancel) return;
-    if (response.assets) {
-      const uri = response.assets[0].uri;
-      callback(uri);
-    }
-  });
+  launchImageLibrary(options, response =>
+    handleImagePicked(response, callback),
+  );
 };
 
 const openCamera = async callback => {
@@ -33,19 +56,8 @@ const openCamera = async callback => {
     const result = await Permissions.requestCameraPermission();
     if (!result) return;
   }
-  launchCamera(options, response => {
-    if (!response) {
-      console.log('Invalid response from camera');
-      return;
-    }
-    if (response.didCancel) {
-      return;
-    }
-    if (response.assets) {
-      const uri = response.assets[0].uri;
-      callback(uri);
-    }
-  });
+
+  launchCamera(options, response => handleImagePicked(response, callback));
 };
 
 export {openGallery as openImagePicker, openCamera};

@@ -13,7 +13,12 @@ const Stack = createStackNavigator();
 const App = () => {
   return (
     <>
-      <StatusBar backgroundColor={constants.colors.backgroundColor} />
+      <StatusBar
+        backgroundColor={constants.colors.backgroundColor}
+        barStyle={
+          constants.colorScheme === 'light' ? 'dark-content' : 'light-content'
+        }
+      />
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name="SplashScreen" component={SplashScreen} />

@@ -6,17 +6,14 @@ import {
   View,
   TouchableOpacity,
   Animated,
-  ToastAndroid,
   BackHandler,
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
 import LinearGradient from 'react-native-linear-gradient';
 import ToggleButtons from '../components/ToggleButtons';
-import SaveModal from '../components/SaveModal';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
 const {width, height} = constants.screen;
-import {saveImageToGallery} from '../utils/imageSaver';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import DiscardChangesModal from '../components/DiscardChangesModal';
 
@@ -25,7 +22,6 @@ const Home = ({route}) => {
   const viewShotRef = useRef(null);
   const {originalImage, processedImage} = route.params;
   const [activeTab, setActiveTab] = useState('Removed');
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [footerState, setFooterState] = useState('initial');
   const [colorState, setColorState] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState(null);
@@ -34,7 +30,7 @@ const Home = ({route}) => {
   const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
   const [hasTransitioned, setHasTransitioned] = useState(false);
   const transitionValue = useRef(new Animated.Value(0)).current;
-  const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false); // State for discard modal
+  const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false);
 
   useEffect(() => {
     if (!hasTransitioned) {
@@ -70,13 +66,15 @@ const Home = ({route}) => {
       },
     );
   }, [originalImage]);
+
   const clearBackground = () => {
-    console.log('clearing everything');
     setBackgroundColor(null);
     setSelectedGradient(null);
     setSelectedBackgroundImage(null);
   };
+
   const handleShareImage = async () => {
+    const uri = await viewShotRef.current.capture();
     let background = '';
     let type = '';
     if (selectedGradient) {
@@ -92,22 +90,14 @@ const Home = ({route}) => {
       type = 'nobackground';
       background = '';
     }
-    saveImageToGallery(processedImage, background, type, navigation)
-      .then(result => {
-        console.log('what is the result =====>', result);
-        if (result) {
-          ToastAndroid.show('Image saved to gallery', ToastAndroid.SHORT);
-          setIsModalVisible(false);
-          navigation.navigate('ShareToSocial', {
-            processedImage: result,
-          });
-        }
-      })
-      .catch(error => {
-        console.log('what is the error during saving ========>', error);
-      });
-  };
 
+    navigation.navigate('ShareToSocial', {
+      processedImage: uri,
+      background,
+      type,
+      originalProcessedImage: processedImage,
+    });
+  };
   const selectGalleryImage = useCallback(uri => {
     setSelectedBackgroundImage(uri);
     setBackgroundColor(null);
@@ -132,21 +122,22 @@ const Home = ({route}) => {
     },
     [backgroundColor, selectedGradient],
   );
+
   useFocusEffect(
     React.useCallback(() => {
       const backAction = () => {
         setIsDiscardModalVisible(true);
-        return true; // Prevents the default back action
+        return true;
       };
       const backHandler = BackHandler.addEventListener(
         'hardwareBackPress',
         backAction,
       );
 
-      // Clean up the event listener when the screen is unfocused or unmounted
       return () => backHandler.remove();
     }, []),
   );
+
   const handleDiscard = () => {
     clearBackground();
     setIsDiscardModalVisible(false);
@@ -217,7 +208,7 @@ const Home = ({route}) => {
               resizeMode="contain"
               source={require('../assets/icons/left_arrow.png')}
               style={styles.iconStyle}
-              tintColor={constants.colors.iconsColor}
+              tintColor={constants.colors.textSecondary}
             />
           </TouchableOpacity>
           <Text style={styles.topBarText} allowFontScaling={false}>
@@ -226,10 +217,10 @@ const Home = ({route}) => {
         </View>
         {activeTab !== 'Original' && (
           <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => setIsModalVisible(true)}>
-            <Text style={styles.saveButtonText} allowFontScaling={false}>
-              Share
+            style={styles.shareButton}
+            onPress={handleShareImage}>
+            <Text style={styles.shareButtonText} allowFontScaling={false}>
+              Done
             </Text>
           </TouchableOpacity>
         )}
@@ -265,7 +256,7 @@ const Home = ({route}) => {
                       overflow: 'hidden',
                     }}>
                     <Image
-                      source={require('../assets/images/square_background.jpg')}
+                      source={require('../assets/images/square_background.png')}
                       style={[styles.checkeredBackground, imageDimensions]}
                     />
                     <Image
@@ -307,11 +298,6 @@ const Home = ({route}) => {
           clearBackground={clearBackground}
         />
       </View>
-      <SaveModal
-        onNormal={handleShareImage}
-        visible={isModalVisible}
-        onClose={() => setIsModalVisible(!isModalVisible)}
-      />
       <DiscardChangesModal
         visible={isDiscardModalVisible}
         onClose={() => setIsDiscardModalVisible(false)}
@@ -343,15 +329,14 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     color: constants.colors.textSecondary,
   },
-  saveButton: {
+  shareButton: {
     backgroundColor: constants.colors.primary,
     borderRadius: 20,
     paddingVertical: height * 0.01,
     paddingHorizontal: width * 0.05,
   },
-
-  saveButtonText: {
-    color: constants.colors.textPrimary,
+  shareButtonText: {
+    color: constants.colors.white,
     fontSize: constants.fontSizes.small,
   },
   contentContainer: {
@@ -370,6 +355,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 7,
     overflow: 'hidden',
+    borderWidth: 0.7,
+    borderColor: 'grey',
   },
   backgroundContainer: {
     justifyContent: 'center',
@@ -392,4 +379,5 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
 });
+
 export default Home;

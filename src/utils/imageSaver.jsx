@@ -50,6 +50,8 @@ export const saveImageToGallery = (
       } else if (backgroundType === 'image') {
         backgroundData = {type: 'image', uri: background};
       }
+      console.log('Continue');
+
       TransparifyHelper.mergeImageWithBackground(base64Image, backgroundData)
         .then(async res => {
           await RNFS.copyFile(res, savePath);

@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   titleStyle: {
     fontSize: constants.fontSizes.xlarge,
     fontWeight: 'bold',
-    color: constants.colors.black,
+    color: constants.colors.textPrimary,
     marginBottom: height * 0.05,
   },
   textStyle: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    color: constants.colors.backgroundColor,
+    color: constants.colors.white,
     fontSize: constants.fontSizes.medium,
     fontWeight: 'bold',
   },

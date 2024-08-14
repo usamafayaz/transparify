@@ -1,112 +1,90 @@
 import React from 'react';
-import {Image, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
-import Share from 'react-native-share';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ToastAndroid,
+  Share,
+} from 'react-native';
 import constants from '../config/constants';
+import {saveImageToGallery} from '../utils/imageSaver';
 
 const {width, height} = constants.screen;
 
-const ShareToSocial = ({route}) => {
-  const {processedImage} = route.params;
-
-  const handleShare = async platform => {
-    let shareOptions;
-
-    switch (platform) {
-      case 'WhatsApp':
-        shareOptions = {
-          title: 'Share Image',
-          message: 'Check out this image!',
-          url: processedImage,
-          social: Share.Social.WHATSAPP,
-        };
-        break;
-      case 'Facebook':
-        shareOptions = {
-          title: 'Share Image',
-          message: 'Check out this image!',
-          url: processedImage,
-          social: Share.Social.SNAPCHAT,
-        };
-        break;
-      case 'Instagram':
-        shareOptions = {
-          title: 'Share Image',
-          message: 'Check out this image!',
-          url: processedImage,
-          social: Share.Social.FACEBOOK,
-        };
-        break;
-      case 'Share':
-        shareOptions = {
-          title: 'Share Image',
-          message: 'Check out this image!',
-          url: processedImage,
-          social: Share.Social.FACEBOOK,
-        };
-        break;
-      default:
-        alert('Unsupported platform');
-        return;
-    }
-
+const ShareToSocial = ({route, navigation}) => {
+  const {processedImage, background, type, originalProcessedImage} =
+    route.params;
+  const handleShare = async () => {
     try {
-      await Share.shareSingle(shareOptions);
+      await Share.share({
+        message: 'Check out this image!',
+        url: processedImage,
+      });
     } catch (error) {
       console.error('Error sharing image:', error);
+    }
+  };
+
+  const handleSaveToGallery = async () => {
+    try {
+      const result = await saveImageToGallery(
+        originalProcessedImage,
+        background,
+        type,
+      );
+      if (result) {
+        ToastAndroid.show(
+          'Image saved to gallery successfully!',
+          ToastAndroid.SHORT,
+        );
+      }
+    } catch (error) {
+      console.error('Error saving image to gallery:', error);
+      ToastAndroid.show('Failed to save image to gallery.', ToastAndroid.SHORT);
     }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text style={styles.topBarText} allowFontScaling={false}>
-          Transparify
-        </Text>
-        <TouchableOpacity onPress={() => handleShare('Share')}>
-          <Image
-            source={require('../assets/icons/invite.png')}
-            style={styles.inviteStyle}
-            tintColor={constants.colors.iconsColor}
-          />
-        </TouchableOpacity>
+        <View style={styles.leftHalfTopBar}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Image
+              resizeMode="contain"
+              source={require('../assets/icons/left_arrow.png')}
+              style={styles.smallIconStyle}
+              tintColor={constants.colors.textSecondary}
+            />
+          </TouchableOpacity>
+          <Text style={styles.topBarText} allowFontScaling={false}>
+            Transparify
+          </Text>
+        </View>
       </View>
       <View style={styles.contentContainer}>
         <View style={styles.imageContainer}>
-          <Image
-            source={{uri: `file:///${processedImage}`}}
-            style={styles.processedImage}
-          />
+          <Image source={{uri: processedImage}} style={styles.processedImage} />
         </View>
-        <Text
-          style={[styles.topBarText, {fontWeight: '500', marginTop: 20}]}
-          allowFontScaling={false}>
-          Share Image
-        </Text>
         <View style={styles.iconRow}>
-          <TouchableOpacity onPress={() => handleShare('WhatsApp')}>
+          <TouchableOpacity
+            onPress={handleSaveToGallery}
+            style={styles.iconContainer}>
             <Image
-              source={require('../assets/icons/whatsapp.png')}
+              source={require('../assets/icons/download.png')}
               style={styles.iconStyle}
+              tintColor={constants.colors.textPrimary}
             />
+            <Text style={styles.iconText}>Gallery</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleShare('Facebook')}>
+          <TouchableOpacity onPress={handleShare} style={styles.iconContainer}>
             <Image
-              source={require('../assets/icons/facebook.png')}
-              style={styles.iconStyle}
+              source={require('../assets/icons/send.png')}
+              style={[styles.iconStyle, {width: 20, height: 20}]}
+              tintColor={constants.colors.textPrimary}
             />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleShare('Instagram')}>
-            <Image
-              source={require('../assets/icons/instagram.png')}
-              style={styles.iconStyle}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleShare('Share')}>
-            <Image
-              tintColor={constants.colors.iconsColor}
-              source={require('../assets/icons/share.png')}
-              style={styles.iconStyle}
-            />
+            <Text style={styles.iconText}>Share</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -125,45 +103,67 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: width * 0.05,
-    marginTop: height * 0.01,
+    marginTop: height * 0.001,
+  },
+  leftHalfTopBar: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   topBarText: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
     color: constants.colors.textSecondary,
+    marginLeft: width * 0.05,
   },
   contentContainer: {
-    alignItems: 'center',
-    marginTop: height * 0.1,
-    borderRadius: 37,
-  },
-  imageContainer: {
-    width: '100%',
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 30,
+  },
+  imageContainer: {
+    width: '90%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: height * 0.05,
   },
   processedImage: {
     width: '100%',
-    height: height * 0.5,
+    height: '100%',
     resizeMode: 'contain',
-    overflow: 'hidden',
   },
   iconRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginTop: 10,
     width: '60%',
   },
-  iconStyle: {
-    height: height * 0.1,
-    width: width * 0.1,
-    resizeMode: 'contain',
+  iconContainer: {
+    alignItems: 'center',
+    backgroundColor: constants.colors.buttonBackground,
+    flexDirection: 'row',
+    width: 120,
+    height: 50,
+    borderRadius: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginHorizontal: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  inviteStyle: {
-    height: height * 0.07,
-    width: width * 0.07,
-    marginRight: width * 0.01,
+  iconStyle: {
+    height: 25,
+    width: 25,
+    resizeMode: 'contain',
+    marginRight: 8,
+  },
+  iconText: {
+    fontSize: constants.fontSizes.small,
+    color: constants.colors.textPrimary,
+  },
+  smallIconStyle: {
+    height: height * 0.08,
+    width: width * 0.08,
     resizeMode: 'contain',
   },
 });

@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   BackHandler,
   ToastAndroid,
+  StatusBar,
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import constants from '../config/constants';
@@ -19,7 +20,37 @@ const {height, width} = constants.screen;
 const ImageUpload = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [backPressCount, setBackPressCount] = useState(0);
+  const [loadingText, setLoadingText] = useState('');
   const navigation = useNavigation();
+
+  const waitingLines = [
+    'Hang tight, magic is happening...',
+    'Almost there, just a little more...',
+    'Transforming your image, stay tuned...',
+    'Good things take time, just a moment...',
+    'Making it perfect, please wait...',
+    'Creating transparency, hold on...',
+    "Working on it, won't be long now...",
+    'Patience is a virtue, almost done...',
+    'Crafting your image, just a bit more...',
+    'Preparing the final touch, please stand by...',
+  ];
+
+  const getRandomLine = () => {
+    return waitingLines[Math.floor(Math.random() * waitingLines.length)];
+  };
+
+  useEffect(() => {
+    let interval;
+    if (isLoading) {
+      setLoadingText(getRandomLine());
+      interval = setInterval(() => {
+        setLoadingText(getRandomLine());
+      }, 5000); // Change the line every 5 seconds
+    }
+
+    return () => clearInterval(interval);
+  }, [isLoading]);
 
   const handleImagePicked = uri => {
     removeBackground(uri, setIsLoading, navigation);
@@ -31,7 +62,6 @@ const ImageUpload = () => {
         if (backPressCount === 0) {
           setBackPressCount(1);
           ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
-
           setTimeout(() => {
             setBackPressCount(0);
           }, 2000); // Reset the counter after 2 seconds
@@ -52,49 +82,76 @@ const ImageUpload = () => {
   );
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../assets/images/transform.png')}
-        style={styles.mainImageStyle}
-        resizeMode="contain"
-      />
-      <Text style={styles.textStyle} allowFontScaling={false}>
-        Choose an image
-      </Text>
-      <TouchableOpacity
-        style={styles.buttonContainer}
-        onPress={() => openCamera(handleImagePicked)}>
-        <Image
-          source={require('../assets/icons/camera.png')}
-          style={styles.iconStyle}
+    <>
+      {constants.colorScheme === 'dark' && (
+        <StatusBar
+          backgroundColor={
+            isLoading ? 'rgba(0, 0, 0, 0.8)' : constants.colors.backgroundColor
+          }
+          barStyle={
+            constants.colorScheme === 'light' ? 'dark-content' : 'light-content'
+          }
         />
-        <Text style={styles.buttonText} allowFontScaling={false}>
-          Camera
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.buttonContainer}
-        onPress={() => openImagePicker(handleImagePicked)}>
-        <Image
-          source={require('../assets/icons/gallery.png')}
-          style={styles.iconStyle}
-        />
-        <Text style={styles.buttonText} allowFontScaling={false}>
-          Gallery
-        </Text>
-      </TouchableOpacity>
-
-      {isLoading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={constants.colors.primary} />
-          <Text
-            style={[styles.loadingText, {fontSize: 18}]}
-            allowFontScaling={false}>
-            Processing
-          </Text>
-        </View>
       )}
-    </View>
+      <View style={styles.container}>
+        <Image
+          source={require('../assets/images/transform.png')}
+          style={styles.mainImageStyle}
+          resizeMode="contain"
+        />
+        <Text style={styles.textStyle} allowFontScaling={false}>
+          Choose an image
+        </Text>
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={() => openCamera(handleImagePicked)}>
+          <Image
+            source={require('../assets/icons/camera.png')}
+            style={styles.iconStyle}
+          />
+          <Text style={styles.buttonText} allowFontScaling={false}>
+            Camera
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={() => openImagePicker(handleImagePicked)}>
+          <Image
+            source={require('../assets/icons/gallery.png')}
+            style={styles.iconStyle}
+          />
+          <Text style={styles.buttonText} allowFontScaling={false}>
+            Gallery
+          </Text>
+        </TouchableOpacity>
+
+        {isLoading && (
+          <View
+            style={[
+              styles.loadingContainer,
+              {
+                backgroundColor:
+                  constants.colorScheme === 'light'
+                    ? 'rgba(255, 255, 255, 0.8)'
+                    : 'rgba(0, 0, 0, 0.8)',
+              },
+            ]}>
+            <ActivityIndicator
+              size="large"
+              color={constants.colors.textSecondary}
+            />
+            <Text
+              style={[
+                styles.loadingText,
+                {fontSize: constants.fontSizes.medium},
+              ]}
+              allowFontScaling={false}>
+              {loadingText}
+            </Text>
+          </View>
+        )}
+      </View>
+    </>
   );
 };
 
@@ -134,7 +191,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   buttonText: {
-    color: constants.colors.textSecondary,
+    color: constants.colors.textPrimary,
     fontSize: constants.fontSizes.medium,
     fontWeight: '600',
     marginLeft: width * 0.02,
@@ -147,11 +204,10 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   loadingText: {
     fontSize: 16,
-    color: constants.colors.primary,
+    color: constants.colors.textSecondary,
     marginTop: 10,
   },
 });

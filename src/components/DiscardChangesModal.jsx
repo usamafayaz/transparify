@@ -55,13 +55,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: constants.fontSizes.medium,
     fontWeight: 'bold',
     color: constants.colors.textSecondary,
     marginBottom: 10,
   },
   modalMessage: {
-    fontSize: 16,
+    fontSize: constants.fontSizes.small,
     color: constants.colors.textSecondary,
     marginBottom: 20,
   },
@@ -72,11 +72,9 @@ const styles = StyleSheet.create({
   cancelButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: constants.colors.secondary,
-    borderRadius: 5,
   },
   cancelButtonText: {
-    color: constants.colors.textPrimary,
+    color: constants.colors.textSecondary,
   },
   discardButton: {
     paddingVertical: 10,
@@ -85,7 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   discardButtonText: {
-    color: constants.colors.textPrimary,
+    color: constants.colors.white,
   },
 });
 

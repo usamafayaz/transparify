@@ -35,13 +35,16 @@ const Footer = ({
 
   const renderColorOption = ({item}) => (
     <TouchableOpacity
+      disabled={activeTab === 'Original' ? true : false}
       style={[styles.footerButton, {backgroundColor: item}]}
       onPress={() => handleColorSelect(item)}
     />
   );
 
   const renderGradientOption = ({item}) => (
-    <TouchableOpacity onPress={() => handleColorSelect(item)}>
+    <TouchableOpacity
+      disabled={activeTab === 'Original' ? true : false}
+      onPress={() => handleColorSelect(item)}>
       <LinearGradient colors={item} style={styles.footerButton} />
     </TouchableOpacity>
   );
@@ -61,6 +64,7 @@ const Footer = ({
       {footerState === 'initial' ? (
         <View style={styles.footerButtons}>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => updateFooter('color')}>
             <Image
@@ -72,6 +76,7 @@ const Footer = ({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => openImagePicker(selectGalleryImage)}>
             <Image
@@ -83,6 +88,7 @@ const Footer = ({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => {
               clearBackground();
@@ -99,6 +105,7 @@ const Footer = ({
       ) : footerState === 'color' && colorState === null ? (
         <View style={styles.footerButtons}>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => updateFooter('initial')}>
             <Image
@@ -107,6 +114,7 @@ const Footer = ({
             />
           </TouchableOpacity>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => {
               setColorState('solid');
@@ -120,6 +128,7 @@ const Footer = ({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => {
               setColorState('gradient');
@@ -136,6 +145,7 @@ const Footer = ({
       ) : (
         <View style={styles.footerButtons}>
           <TouchableOpacity
+            disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => setColorState(null)}>
             <Image
@@ -143,8 +153,9 @@ const Footer = ({
               style={styles.footerIcon}
             />
           </TouchableOpacity>
-          {colorState === 'solid' && (
+          {/* {colorState === 'solid' && (
             <TouchableOpacity
+              disabled={activeTab === 'Original' ? true : false}
               style={styles.footerButton}
               onPress={() => setColorModal(true)}>
               <Image
@@ -152,7 +163,7 @@ const Footer = ({
                 style={styles.footerIcon}
               />
             </TouchableOpacity>
-          )}
+          )} */}
           {colorState === 'solid' && (
             <FlatList
               data={basicColors}
@@ -173,11 +184,11 @@ const Footer = ({
           )}
         </View>
       )}
-      <ColorPickerModal
+      {/* <ColorPickerModal
         visible={colorModal}
         onCancel={() => setColorModal(false)}
         onColorSelected={onSelectColor}
-      />
+      /> */}
     </View>
   );
 };
@@ -200,9 +211,9 @@ const styles = StyleSheet.create({
     marginTop: height * 0.02,
   },
   footerButton: {
-    backgroundColor: constants.colors.buttonBackground,
-    height: width * 0.17,
-    width: width * 0.17,
+    backgroundColor: constants.colors.toggleButtonBackground,
+    height: width * 0.16,
+    width: width * 0.16,
     justifyContent: 'center',
     borderRadius: 10,
     alignItems: 'center',

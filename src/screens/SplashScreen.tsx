@@ -96,14 +96,14 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     width: '20%',
     height: 7,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: constants.colors.progressbarColor,
     borderRadius: 5,
     overflow: 'hidden',
     marginTop: 20,
   },
   progressBar: {
     height: '100%',
-    backgroundColor: constants.colors.backgroundColor,
+    backgroundColor: constants.colors.primary,
   },
 });
 

@@ -4,27 +4,29 @@ const {width, height} = Dimensions.get('window');
 
 // Define colors for light and dark themes
 const lightColors = {
-  primary: '#202455',
-  buttonBackground: '#F4F4F4',
-  background: '#ecf0f1',
-  textPrimary: '#2c3e50',
+  backgroundColor: '#FFFFFF',
+  textPrimary: '#000000',
   textSecondary: '#5B5B5B',
-  activeToggleButtonColor: '#ffffff',
-  backgroundColor: '#ffffff',
-  black: '#000000',
-  iconsColor: '#000000',
+  primary: '#202455',
+  toggleButtonBackground: '#F4F4F4',
+  toggleButtonSelectedText: '#000000',
+  buttonBackground: '#F4F4F4',
+  white: '#FFFFFF',
+  progressbarColor: '#D5D5D5',
+  loaderColor: '#5B5B5B',
 };
 
 const darkColors = {
-  primary: '#545454',
-  buttonBackground: '#545454',
-  background: '#1e1e1e',
-  textPrimary: '#e0e0e0',
-  textSecondary: '#b0b0b0',
-  backgroundColor: '#121212',
-  black: '#000000',
-  activeToggleButtonColor: '#222222',
-  iconsColor: '#ffffff',
+  backgroundColor: '#222222',
+  textPrimary: '#E0E0E0',
+  textSecondary: '#C5C5C5',
+  primary: '#7D5FB9',
+  toggleButtonBackground: '#353535',
+  toggleButtonSelectedText: '#FFFFFF',
+  buttonBackground: '#353535',
+  white: '#FFFFFF',
+  progressbarColor: '#FFFFFF',
+  loaderColor: '#5B5B5B',
 };
 
 const fontSizes = {
@@ -56,12 +58,14 @@ const constants = {
     colors: lightColors,
     fontFamilies,
     screen,
+    colorScheme,
   },
   dark: {
     fontSizes,
     colors: darkColors,
     fontFamilies,
     screen,
+    colorScheme,
   },
 };
 
