@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import constants from '../config/constants';
 import {saveImageToGallery} from '../utils/imageSaver';
+import Permissions from '../utils/permissions';
 
 const {width, height} = constants.screen;
 

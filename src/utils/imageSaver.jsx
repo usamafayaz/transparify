@@ -56,7 +56,7 @@ export const saveImageToGallery = (
         .then(async res => {
           await RNFS.copyFile(res, savePath);
           await RNFS.scanFile(savePath);
-          resolve(savePath);
+          resolve(res);
         })
         .catch(error => {
           console.log('what is the error during merge ====>', error);
