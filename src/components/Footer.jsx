@@ -171,6 +171,9 @@ const Footer = ({
               keyExtractor={(item, index) => index.toString()}
               horizontal
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={10} // Number of items to render initially
+              maxToRenderPerBatch={10} // Number of items to render in each batch
+              windowSize={5} // Number of items to keep in memory
             />
           )}
           {colorState === 'gradient' && (
@@ -180,6 +183,9 @@ const Footer = ({
               keyExtractor={(item, index) => index.toString()}
               horizontal
               showsHorizontalScrollIndicator={false}
+              initialNumToRender={10} // Number of items to render initially
+              maxToRenderPerBatch={10} // Number of items to render in each batch
+              windowSize={5} // Number of items to keep in memory
             />
           )}
         </View>
@@ -199,6 +205,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: constants.colors.backgroundColor,
     paddingBottom: height * 0.03,
+    paddingHorizontal: width * 0.02,
   },
   footerText: {
     fontSize: constants.fontSizes.small,

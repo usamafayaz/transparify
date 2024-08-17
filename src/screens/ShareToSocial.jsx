@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect, useMemo, useCallback} from 'react';
 import {
   Image,
   StyleSheet,
@@ -8,85 +8,131 @@ import {
   ToastAndroid,
   Share,
 } from 'react-native';
+import RNFS from 'react-native-fs';
 import constants from '../config/constants';
-import {saveImageToGallery} from '../utils/imageSaver';
 import Permissions from '../utils/permissions';
+import {calculateImageDimensions} from '../utils/imageDimension';
 
 const {width, height} = constants.screen;
 
+const TopBar = React.memo(({onBackPress}) => (
+  <View style={styles.topBar}>
+    <View style={styles.leftHalfTopBar}>
+      <TouchableOpacity onPress={onBackPress}>
+        <Image
+          resizeMode="contain"
+          source={require('../assets/icons/left_arrow.png')}
+          style={styles.smallIconStyle}
+          tintColor={constants.colors.textSecondary}
+        />
+      </TouchableOpacity>
+      <Text style={styles.topBarText} allowFontScaling={false}>
+        Transparify
+      </Text>
+    </View>
+  </View>
+));
+
+const IconButton = React.memo(({onPress, icon, text}) => (
+  <TouchableOpacity onPress={onPress} style={styles.iconContainer}>
+    <Image
+      source={icon}
+      style={[styles.iconStyle, text === 'Share' && {width: 20, height: 20}]}
+      tintColor={constants.colors.textPrimary}
+    />
+    <Text style={styles.iconText}>{text}</Text>
+  </TouchableOpacity>
+));
+
 const ShareToSocial = ({route, navigation}) => {
-  const {processedImage, background, type, originalProcessedImage} =
-    route.params;
-  const handleShare = async () => {
+  const {mergedImage, noBackground} = route.params;
+  const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
+
+  useEffect(() => {
+    const imageUri = noBackground ? mergedImage : `file://${mergedImage}`;
+    calculateImageDimensions(imageUri)
+      .then(setImageDimensions)
+      .catch(error =>
+        console.error('Error calculating image dimensions:', error),
+      );
+  }, [mergedImage, noBackground]);
+
+  const handleShare = useCallback(async () => {
     try {
       await Share.share({
         message: 'Check out this image!',
-        url: processedImage,
+        url: mergedImage,
       });
     } catch (error) {
       console.error('Error sharing image:', error);
     }
-  };
+  }, [mergedImage]);
 
-  const handleSaveToGallery = async () => {
+  const handleSaveToGallery = useCallback(async () => {
     try {
-      const result = await saveImageToGallery(
-        originalProcessedImage,
-        background,
-        type,
-      );
-      if (result) {
-        ToastAndroid.show(
-          'Image saved to gallery successfully!',
-          ToastAndroid.SHORT,
-        );
+      const writePermissionGranted = await Permissions.checkWritePermission();
+      if (!writePermissionGranted) {
+        const result = await Permissions.requestWritePermission();
+        if (!result) return false;
       }
+      const directoryPath = `${RNFS.PicturesDirectoryPath}`;
+      const savePath = `${
+        RNFS.PicturesDirectoryPath
+      }/${new Date().getTime()}.png`;
+      const exists = await RNFS.exists(directoryPath);
+
+      if (!exists) {
+        await RNFS.mkdir(directoryPath);
+        console.log('directory created');
+      }
+      if (noBackground) {
+        RNFS.writeFile(savePath, mergedImage.split(',')[1], 'base64');
+        await RNFS.scanFile(savePath);
+      } else {
+        await RNFS.copyFile(mergedImage, savePath);
+        await RNFS.scanFile(savePath);
+      }
+      ToastAndroid.show(
+        'Image saved to gallery successfully!',
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
       console.error('Error saving image to gallery:', error);
       ToastAndroid.show('Failed to save image to gallery.', ToastAndroid.SHORT);
     }
-  };
+  }, [mergedImage, noBackground]);
+
+  const imageSource = useMemo(
+    () => ({
+      uri: noBackground ? mergedImage : `file://${mergedImage}`,
+    }),
+    [mergedImage, noBackground],
+  );
+
+  const handleBackPress = useCallback(() => navigation.goBack(), [navigation]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.topBar}>
-        <View style={styles.leftHalfTopBar}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image
-              resizeMode="contain"
-              source={require('../assets/icons/left_arrow.png')}
-              style={styles.smallIconStyle}
-              tintColor={constants.colors.textSecondary}
-            />
-          </TouchableOpacity>
-          <Text style={styles.topBarText} allowFontScaling={false}>
-            Transparify
-          </Text>
-        </View>
-      </View>
+      <TopBar onBackPress={handleBackPress} />
       <View style={styles.contentContainer}>
-        <View style={styles.imageContainer}>
-          <Image source={{uri: processedImage}} style={styles.processedImage} />
+        <View style={[styles.imageContainer, imageDimensions]}>
+          <Image
+            source={imageSource}
+            style={[styles.processedImage, imageDimensions]}
+            resizeMode="contain"
+          />
         </View>
         <View style={styles.iconRow}>
-          <TouchableOpacity
+          <IconButton
             onPress={handleSaveToGallery}
-            style={styles.iconContainer}>
-            <Image
-              source={require('../assets/icons/download.png')}
-              style={styles.iconStyle}
-              tintColor={constants.colors.textPrimary}
-            />
-            <Text style={styles.iconText}>Gallery</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleShare} style={styles.iconContainer}>
-            <Image
-              source={require('../assets/icons/send.png')}
-              style={[styles.iconStyle, {width: 20, height: 20}]}
-              tintColor={constants.colors.textPrimary}
-            />
-            <Text style={styles.iconText}>Share</Text>
-          </TouchableOpacity>
+            icon={require('../assets/icons/download.png')}
+            text="Gallery"
+          />
+          <IconButton
+            onPress={handleShare}
+            icon={require('../assets/icons/send.png')}
+            text="Share"
+          />
         </View>
       </View>
     </View>
@@ -104,7 +150,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: width * 0.05,
-    marginTop: height * 0.001,
+    marginTop: height * 0.0007,
   },
   leftHalfTopBar: {
     flex: 1,
@@ -123,15 +169,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   imageContainer: {
-    width: '90%',
-    aspectRatio: 1,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: height * 0.05,
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderRadius: 7,
+    overflow: 'hidden',
   },
   processedImage: {
-    width: '100%',
-    height: '100%',
     resizeMode: 'contain',
   },
   iconRow: {

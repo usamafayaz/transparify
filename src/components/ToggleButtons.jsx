@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   },
   toggleButtonText: {
     fontSize: constants.fontSizes.small,
+    paddingBottom: 1,
     color: constants.colors.textSecondary,
   },
 });

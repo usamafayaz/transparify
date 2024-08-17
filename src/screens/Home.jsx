@@ -1,4 +1,6 @@
-import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
+// src/screens/Home.js
+
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   Image,
   StyleSheet,
@@ -7,15 +9,20 @@ import {
   TouchableOpacity,
   Animated,
   BackHandler,
+  ToastAndroid,
+  ActivityIndicator,
 } from 'react-native';
 import ViewShot from 'react-native-view-shot';
-import LinearGradient from 'react-native-linear-gradient';
 import ToggleButtons from '../components/ToggleButtons';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
-const {width, height} = constants.screen;
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import DiscardChangesModal from '../components/DiscardChangesModal';
+import {mergeBackgroundAndImage} from '../utils/imageSaver';
+import {calculateImageDimensions} from '../utils/imageDimension';
+import BackgroundRenderer from '../components/BackgroundRenderer';
+
+const {width, height} = constants.screen;
 
 const Home = ({route}) => {
   const navigation = useNavigation();
@@ -31,6 +38,7 @@ const Home = ({route}) => {
   const [hasTransitioned, setHasTransitioned] = useState(false);
   const transitionValue = useRef(new Animated.Value(0)).current;
   const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!hasTransitioned) {
@@ -48,33 +56,21 @@ const Home = ({route}) => {
   }, [hasTransitioned, transitionValue]);
 
   useEffect(() => {
-    Image.getSize(
-      originalImage,
-      (originalWidth, originalHeight) => {
-        const aspectRatio = originalWidth / originalHeight;
-        let newWidth = width * 0.9;
-        let newHeight = newWidth / aspectRatio;
-
-        if (newHeight > height * 0.6) {
-          newHeight = height * 0.6;
-          newWidth = newHeight * aspectRatio;
-        }
-        setImageDimensions({width: newWidth, height: newHeight});
-      },
-      error => {
-        console.error('Error getting image size:', error);
-      },
-    );
+    calculateImageDimensions(originalImage)
+      .then(setImageDimensions)
+      .catch(error =>
+        console.error('Error calculating image dimensions:', error),
+      );
   }, [originalImage]);
 
-  const clearBackground = () => {
+  const clearBackground = useCallback(() => {
     setBackgroundColor(null);
     setSelectedGradient(null);
     setSelectedBackgroundImage(null);
-  };
+  }, []);
 
   const handleShareImage = async () => {
-    const uri = await viewShotRef.current.capture();
+    setIsLoading(true);
     let background = '';
     let type = '';
     if (selectedGradient) {
@@ -91,13 +87,34 @@ const Home = ({route}) => {
       background = '';
     }
 
-    navigation.navigate('ShareToSocial', {
-      processedImage: uri,
-      background,
-      type,
-      originalProcessedImage: processedImage,
-    });
+    try {
+      if (type === 'nobackground' && background === '') {
+        navigation.navigate('ShareToSocial', {
+          mergedImage: processedImage,
+          noBackground: true,
+        });
+        setIsLoading(false);
+        return;
+      }
+      const result = await mergeBackgroundAndImage(
+        processedImage,
+        background,
+        type,
+      );
+      if (result) {
+        navigation.navigate('ShareToSocial', {
+          mergedImage: result,
+          noBackground: false,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving image to gallery:', error);
+      ToastAndroid.show('Failed to save image to gallery.', ToastAndroid.SHORT);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   const selectGalleryImage = useCallback(uri => {
     setSelectedBackgroundImage(uri);
     setBackgroundColor(null);
@@ -133,77 +150,94 @@ const Home = ({route}) => {
         'hardwareBackPress',
         backAction,
       );
-
       return () => backHandler.remove();
     }, []),
   );
 
-  const handleDiscard = () => {
+  const handleDiscard = useCallback(() => {
     clearBackground();
     setIsDiscardModalVisible(false);
     navigation.goBack();
-  };
+  }, [clearBackground, navigation]);
 
-  const renderBackground = useMemo(() => {
-    if (selectedGradient) {
+  const renderContent = useCallback(() => {
+    if (
+      !backgroundColor &&
+      !selectedGradient &&
+      !selectedBackgroundImage &&
+      activeTab !== 'Original'
+    ) {
       return (
-        <LinearGradient
-          colors={selectedGradient}
-          style={[styles.backgroundContainer, imageDimensions]}>
+        <View style={[styles.image, imageDimensions]}>
           <Image
-            source={{uri: processedImage}}
-            style={styles.processedImage}
+            source={{uri: originalImage}}
+            style={[styles.image, imageDimensions]}
             resizeMode="contain"
           />
-        </LinearGradient>
-      );
-    } else if (selectedBackgroundImage) {
-      return (
-        <View style={[styles.backgroundContainer, imageDimensions]}>
-          <Image
-            source={{uri: selectedBackgroundImage}}
-            style={StyleSheet.absoluteFill}
-            resizeMode="cover"
-          />
-          <Image
-            source={{uri: processedImage}}
-            style={styles.processedImage}
-            resizeMode="contain"
-          />
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                flexDirection: 'row',
+                overflow: 'hidden',
+              },
+            ]}>
+            <Animated.View
+              style={{
+                flex: transitionValue,
+                overflow: 'hidden',
+              }}>
+              <Image
+                source={require('../assets/images/square_background.png')}
+                style={[styles.checkeredBackground, imageDimensions]}
+              />
+              <Image
+                source={{uri: processedImage}}
+                style={[styles.image, imageDimensions, StyleSheet.absoluteFill]}
+                resizeMode="contain"
+              />
+            </Animated.View>
+            <Animated.View
+              style={{flex: Animated.subtract(1, transitionValue)}}
+            />
+          </Animated.View>
         </View>
+      );
+    } else if (activeTab === 'Original') {
+      return (
+        <Image
+          source={{uri: originalImage}}
+          style={[styles.image, imageDimensions]}
+          resizeMode="contain"
+        />
       );
     } else {
       return (
-        <View
-          style={[
-            styles.backgroundContainer,
-            imageDimensions,
-            {backgroundColor},
-          ]}>
-          <Image
-            source={{uri: processedImage}}
-            style={styles.processedImage}
-            resizeMode="contain"
-          />
-        </View>
+        <BackgroundRenderer
+          selectedGradient={selectedGradient}
+          selectedBackgroundImage={selectedBackgroundImage}
+          backgroundColor={backgroundColor}
+          imageDimensions={imageDimensions}
+          processedImage={processedImage}
+        />
       );
     }
   }, [
+    backgroundColor,
     selectedGradient,
     selectedBackgroundImage,
-    backgroundColor,
-    imageDimensions,
+    activeTab,
+    originalImage,
     processedImage,
+    imageDimensions,
+    transitionValue,
   ]);
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
         <View style={styles.leftHalfTopBar}>
-          <TouchableOpacity
-            onPress={() => {
-              setIsDiscardModalVisible(true);
-            }}>
+          <TouchableOpacity onPress={() => setIsDiscardModalVisible(true)}>
             <Image
               resizeMode="contain"
               source={require('../assets/icons/left_arrow.png')}
@@ -218,10 +252,15 @@ const Home = ({route}) => {
         {activeTab !== 'Original' && (
           <TouchableOpacity
             style={styles.shareButton}
-            onPress={handleShareImage}>
-            <Text style={styles.shareButtonText} allowFontScaling={false}>
-              Done
-            </Text>
+            onPress={handleShareImage}
+            disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator color={constants.colors.white} />
+            ) : (
+              <Text style={styles.shareButtonText} allowFontScaling={false}>
+                Done
+              </Text>
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -231,60 +270,12 @@ const Home = ({route}) => {
           <ViewShot
             ref={viewShotRef}
             options={{...imageDimensions, quality: 1, format: 'png'}}
-            style={[styles.image, imageDimensions]}>
-            {!backgroundColor &&
-            !selectedGradient &&
-            !selectedBackgroundImage &&
-            activeTab !== 'Original' ? (
-              <View style={[styles.image, imageDimensions]}>
-                <Image
-                  source={{uri: originalImage}}
-                  style={[styles.image, imageDimensions]}
-                  resizeMode="contain"
-                />
-                <Animated.View
-                  style={[
-                    StyleSheet.absoluteFill,
-                    {
-                      flexDirection: 'row',
-                      overflow: 'hidden',
-                    },
-                  ]}>
-                  <Animated.View
-                    style={{
-                      flex: transitionValue,
-                      overflow: 'hidden',
-                    }}>
-                    <Image
-                      source={require('../assets/images/square_background.png')}
-                      style={[styles.checkeredBackground, imageDimensions]}
-                    />
-                    <Image
-                      source={{uri: processedImage}}
-                      style={[
-                        styles.image,
-                        imageDimensions,
-                        StyleSheet.absoluteFill,
-                      ]}
-                      resizeMode="contain"
-                    />
-                  </Animated.View>
-                  <Animated.View
-                    style={{
-                      flex: Animated.subtract(1, transitionValue),
-                    }}
-                  />
-                </Animated.View>
-              </View>
-            ) : activeTab === 'Original' ? (
-              <Image
-                source={{uri: originalImage}}
-                style={[styles.image, imageDimensions]}
-                resizeMode="contain"
-              />
-            ) : (
-              renderBackground
-            )}
+            style={[
+              styles.image,
+              imageDimensions,
+              {borderWidth: 1, borderColor: 'grey'},
+            ]}>
+            {renderContent()}
           </ViewShot>
         </View>
         <Footer
@@ -332,8 +323,10 @@ const styles = StyleSheet.create({
   shareButton: {
     backgroundColor: constants.colors.primary,
     borderRadius: 20,
-    paddingVertical: height * 0.01,
-    paddingHorizontal: width * 0.05,
+    height: height * 0.048,
+    width: width * 0.2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   shareButtonText: {
     color: constants.colors.white,
@@ -348,23 +341,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    borderRadius: 7,
   },
   image: {
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 7,
     overflow: 'hidden',
-    borderWidth: 0.7,
-    borderColor: 'grey',
-  },
-  backgroundContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  processedImage: {
-    width: '100%',
-    height: '100%',
   },
   checkeredBackground: {
     position: 'absolute',

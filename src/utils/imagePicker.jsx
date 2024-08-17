@@ -6,6 +6,8 @@ const options = {
   mediaType: 'photo',
   quality: 1,
   includeBase64: false,
+  maxWidth: 6000,
+  maxHeight: 6000,
 };
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
@@ -19,12 +21,12 @@ const showSizeExceededAlert = () => {
 };
 
 const handleImagePicked = (response, callback) => {
-  if (!response) {
-    console.log('Invalid response from image picker');
+  if (response.didCancel) return;
+  if (response.errorCode) {
+    console.error('ImagePicker Error: ', response.errorMessage);
     return;
   }
-  if (response.didCancel) return;
-  if (response.assets) {
+  if (response.assets && response.assets.length > 0) {
     const asset = response.assets[0];
     const uri = asset.uri;
     const fileSize = asset.fileSize;
@@ -45,7 +47,7 @@ const openGallery = async callback => {
     if (!result) return;
   }
 
-  launchImageLibrary(options, response =>
+  launchImageLibrary({...options, selectionLimit: 1}, response =>
     handleImagePicked(response, callback),
   );
 };
