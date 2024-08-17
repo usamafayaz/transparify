@@ -1,6 +1,6 @@
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Permissions from './permissions';
-import {Alert} from 'react-native';
+import {Alert, Platform} from 'react-native';
 
 const options = {
   mediaType: 'photo',
@@ -55,6 +55,15 @@ const openCamera = async callback => {
   if (!cameraPermissionGranted) {
     const result = await Permissions.requestCameraPermission();
     if (!result) return;
+  }
+
+  // Check for write permission on Android versions below 13
+  if (Platform.OS === 'android' && Platform.Version < 33) {
+    const writePermissionGranted = await Permissions.checkWritePermission();
+    if (!writePermissionGranted) {
+      const result = await Permissions.requestWritePermission();
+      if (!result) return;
+    }
   }
 
   launchCamera(options, response => handleImagePicked(response, callback));

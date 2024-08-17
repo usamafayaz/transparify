@@ -1,4 +1,4 @@
-import { PermissionsAndroid, Platform, Alert, Linking } from 'react-native';
+import {PermissionsAndroid, Platform, Alert, Linking} from 'react-native';
 
 const checkCameraPermission = async () => {
   if (Platform.OS === 'android') {
@@ -15,14 +15,20 @@ const checkCameraPermission = async () => {
   return true;
 };
 
-
 const checkGalleryPermission = async () => {
   if (Platform.OS === 'android') {
     try {
-      const granted = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      );
-      return granted;
+      if (Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
+        );
+        return granted;
+      } else {
+        const granted = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        );
+        return granted;
+      }
     } catch (error) {
       console.error('Error checking gallery permission:', error);
       return false;
@@ -32,7 +38,7 @@ const checkGalleryPermission = async () => {
 };
 
 const checkWritePermission = async () => {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === 'android' && Platform.Version < 33) {
     try {
       const granted = await PermissionsAndroid.check(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -73,9 +79,14 @@ const requestCameraPermission = async () => {
 const requestGalleryPermission = async () => {
   if (Platform.OS === 'android') {
     try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      );
+      let permission;
+      if (Platform.Version >= 33) {
+        permission = PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES;
+      } else {
+        permission = PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+      }
+
+      const granted = await PermissionsAndroid.request(permission);
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         console.log('Gallery permission granted');
         return true;
@@ -95,23 +106,23 @@ const requestGalleryPermission = async () => {
 };
 
 const requestWritePermission = async () => {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === 'android' && Platform.Version < 33) {
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
       );
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('Gallery permission granted');
+        console.log('Write permission granted');
         return true;
       } else if (granted === PermissionsAndroid.RESULTS.DENIED) {
-        console.log('Gallery permission denied');
+        console.log('Write permission denied');
       } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-        console.log('Gallery permission blocked');
-        showPermissionAlert('Gallery');
+        console.log('Write permission blocked');
+        showPermissionAlert('Storage');
       }
       return false;
     } catch (error) {
-      console.error('Error requesting gallery permission:', error);
+      console.error('Error requesting write permission:', error);
       return false;
     }
   }
@@ -132,7 +143,7 @@ const showPermissionAlert = permissionType => {
         onPress: () => Linking.openSettings(),
       },
     ],
-    { cancelable: false },
+    {cancelable: false},
   );
 };
 
