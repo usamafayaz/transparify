@@ -14,6 +14,7 @@ import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import constants from '../config/constants';
 import {openCamera, openImagePicker} from '../utils/imagePicker';
 import {removeBackground} from '../utils/removeBackgroundAPI';
+import LottieView from 'lottie-react-native';
 
 const {height, width} = constants.screen;
 
@@ -136,9 +137,11 @@ const ImageUpload = () => {
                     : 'rgba(0, 0, 0, 0.8)',
               },
             ]}>
-            <ActivityIndicator
-              size="large"
-              color={constants.colors.textSecondary}
+            <LottieView
+              source={require('../assets/animation/loading.json')}
+              autoPlay
+              loop
+              style={styles.lottieAnimation}
             />
             <Text
               style={[
@@ -209,6 +212,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: constants.colors.textSecondary,
     marginTop: 10,
+  },
+  lottieAnimation: {
+    width: 200,
+    height: 200,
   },
 });
 

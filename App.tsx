@@ -1,20 +1,26 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, StatusBar} from 'react-native';
 import {
   createStackNavigator,
   StackCardInterpolationProps,
 } from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
-import SplashScreen from './src/screens/SplashScreen';
 import Welcome from './src/screens/Welcome';
 import ImageUpload from './src/screens/ImageUpload';
 import Home from './src/screens/Home';
 import ShareToSocial from './src/screens/ShareToSocial';
 import constants from './src/config/constants';
+import SplashScreen from 'react-native-splash-screen';
+import Splash from './src/screens/Splash';
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  useEffect(() => {
+    setTimeout(() => {
+      SplashScreen.hide();
+    }, 500);
+  }, []);
   const isDarkMode = constants.colorScheme === 'dark';
 
   const theme = isDarkMode
@@ -76,7 +82,7 @@ const App = () => {
       />
       <NavigationContainer theme={theme}>
         <Stack.Navigator screenOptions={screenOptions}>
-          <Stack.Screen name="SplashScreen" component={SplashScreen} />
+          <Stack.Screen name="Splash" component={Splash} />
           <Stack.Screen name="Welcome" component={Welcome} />
           <Stack.Screen name="Image Upload" component={ImageUpload} />
           <Stack.Screen name="Home" component={Home} />

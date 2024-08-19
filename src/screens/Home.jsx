@@ -70,49 +70,55 @@ const Home = ({route}) => {
   }, []);
 
   const handleShareImage = async () => {
-    setIsLoading(true);
-    let background = '';
-    let type = '';
-    if (selectedGradient) {
-      type = 'gradient';
-      background = selectedGradient;
-    } else if (backgroundColor) {
-      type = 'color';
-      background = backgroundColor;
-    } else if (selectedBackgroundImage) {
-      type = 'image';
-      background = selectedBackgroundImage;
-    } else {
-      type = 'nobackground';
-      background = '';
-    }
+    // Update the button state visually (e.g., by changing opacity, color, etc.)
+    setTimeout(async () => {
+      let background = '';
+      let type = '';
 
-    try {
-      if (type === 'nobackground' && background === '') {
-        navigation.navigate('ShareToSocial', {
-          mergedImage: processedImage,
-          noBackground: true,
-        });
+      if (selectedGradient) {
+        type = 'gradient';
+        background = selectedGradient;
+      } else if (backgroundColor) {
+        type = 'color';
+        background = backgroundColor;
+      } else if (selectedBackgroundImage) {
+        type = 'image';
+        background = selectedBackgroundImage;
+      } else {
+        type = 'nobackground';
+        background = '';
+      }
+
+      try {
+        if (type === 'nobackground' && background === '') {
+          navigation.navigate('ShareToSocial', {
+            mergedImage: processedImage,
+            noBackground: true,
+          });
+          setIsLoading(false);
+          return;
+        }
+        const result = await mergeBackgroundAndImage(
+          processedImage,
+          background,
+          type,
+        );
+        if (result) {
+          navigation.navigate('ShareToSocial', {
+            mergedImage: result,
+            noBackground: false,
+          });
+        }
+      } catch (error) {
+        console.error('Error saving image to gallery:', error);
+        ToastAndroid.show(
+          'Failed to save image to gallery.',
+          ToastAndroid.SHORT,
+        );
+      } finally {
         setIsLoading(false);
-        return;
       }
-      const result = await mergeBackgroundAndImage(
-        processedImage,
-        background,
-        type,
-      );
-      if (result) {
-        navigation.navigate('ShareToSocial', {
-          mergedImage: result,
-          noBackground: false,
-        });
-      }
-    } catch (error) {
-      console.error('Error saving image to gallery:', error);
-      ToastAndroid.show('Failed to save image to gallery.', ToastAndroid.SHORT);
-    } finally {
-      setIsLoading(false);
-    }
+    }, 10); // 100ms delay to allow UI update
   };
 
   const selectGalleryImage = useCallback(uri => {
@@ -252,15 +258,14 @@ const Home = ({route}) => {
         {activeTab !== 'Original' && (
           <TouchableOpacity
             style={styles.shareButton}
-            onPress={handleShareImage}
+            onPress={() => {
+              setIsLoading(true);
+              handleShareImage();
+            }}
             disabled={isLoading}>
-            {isLoading ? (
-              <ActivityIndicator color={constants.colors.white} />
-            ) : (
-              <Text style={styles.shareButtonText} allowFontScaling={false}>
-                Done
-              </Text>
-            )}
+            <Text style={styles.shareButtonText} allowFontScaling={false}>
+              Done
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -289,6 +294,11 @@ const Home = ({route}) => {
           clearBackground={clearBackground}
         />
       </View>
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator color={constants.colors.primary} size={40} />
+        </View>
+      )}
       <DiscardChangesModal
         visible={isDiscardModalVisible}
         onClose={() => setIsDiscardModalVisible(false)}
@@ -359,6 +369,16 @@ const styles = StyleSheet.create({
     height: height * 0.08,
     width: width * 0.08,
     resizeMode: 'contain',
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor:
+      constants.colorScheme === 'light'
+        ? 'rgba(255, 255, 255, 0.8)'
+        : 'rgba(0, 0, 0, 0.8)',
+    zIndex: 10, // Ensure it appears above all other content
   },
 });
 

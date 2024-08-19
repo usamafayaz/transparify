@@ -11,7 +11,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import constants from '../config/constants';
 
-const SplashScreen = () => {
+const Splash = () => {
   const navigation = useNavigation();
   const progressBarWidth = useRef(new Animated.Value(0)).current;
 
@@ -107,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SplashScreen;
+export default Splash;

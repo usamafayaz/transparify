@@ -6,12 +6,12 @@ import {
   View,
   TouchableOpacity,
   ToastAndroid,
-  Share,
 } from 'react-native';
 import RNFS from 'react-native-fs';
 import constants from '../config/constants';
 import Permissions from '../utils/permissions';
 import {calculateImageDimensions} from '../utils/imageDimension';
+import Share from 'react-native-share';
 
 const {width, height} = constants.screen;
 
@@ -58,15 +58,54 @@ const ShareToSocial = ({route, navigation}) => {
   }, [mergedImage, noBackground]);
 
   const handleShare = useCallback(async () => {
+    let tempFilePath = null;
     try {
-      await Share.share({
-        message: 'Check out this image!',
-        url: mergedImage,
-      });
+      let imageUri = mergedImage;
+
+      if (noBackground) {
+        tempFilePath = `${
+          RNFS.CachesDirectoryPath
+        }/temp_share_image_${Date.now()}.png`;
+        await RNFS.writeFile(tempFilePath, mergedImage.split(',')[1], 'base64');
+        imageUri = `file://${tempFilePath}`;
+      } else if (!imageUri.startsWith('file://')) {
+        imageUri = `file://${imageUri}`;
+      }
+
+      const shareOptions = {
+        title: 'Share Transparify Image',
+        message:
+          "Check out this awesome image I created with the Transparify app! It's amazing for removing backgrounds and creating transparent images. Try it yourself!",
+        url: imageUri,
+        type: 'image/png',
+      };
+
+      const shareResponse = await Share.open(shareOptions);
+      console.log('Share response:', shareResponse);
+      ToastAndroid.show('Image shared successfully!', ToastAndroid.SHORT);
     } catch (error) {
-      console.error('Error sharing image:', error);
+      if (error.message.includes('User did not share')) {
+        console.log('User cancelled sharing');
+      } else if (
+        error.message.includes('android.content.ActivityNotFoundException')
+      ) {
+        console.error('No suitable app found for sharing', error);
+        ToastAndroid.show(
+          'No suitable app found for sharing',
+          ToastAndroid.SHORT,
+        );
+      } else {
+        console.warn('Sharing completed, but with an error:', error);
+      }
+    } finally {
+      // Clean up the temporary file if it was created
+      if (tempFilePath) {
+        RNFS.unlink(tempFilePath)
+          .then(() => console.log('Temporary file deleted'))
+          .catch(err => console.warn('Error deleting temporary file:', err));
+      }
     }
-  }, [mergedImage]);
+  }, [mergedImage, noBackground]);
 
   const handleSaveToGallery = useCallback(async () => {
     try {
