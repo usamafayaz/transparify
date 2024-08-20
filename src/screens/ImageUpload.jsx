@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ActivityIndicator,
   BackHandler,
   ToastAndroid,
   StatusBar,
@@ -13,48 +12,46 @@ import {
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import constants from '../config/constants';
 import {openCamera, openImagePicker} from '../utils/imagePicker';
-import {removeBackground} from '../utils/removeBackgroundAPI';
-import LottieView from 'lottie-react-native';
 
 const {height, width} = constants.screen;
 
 const ImageUpload = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [backPressCount, setBackPressCount] = useState(0);
-  const [loadingText, setLoadingText] = useState('');
+  // const [loadingText, setLoadingText] = useState('');
   const navigation = useNavigation();
 
-  const waitingLines = [
-    'Hang tight, magic is happening...',
-    'Almost there, just a little more...',
-    'Transforming your image, stay tuned...',
-    'Good things take time, just a moment...',
-    'Making it perfect, please wait...',
-    'Creating transparency, hold on...',
-    "Working on it, won't be long now...",
-    'Patience is a virtue, almost done...',
-    'Crafting your image, just a bit more...',
-    'Preparing the final touch, please stand by...',
-  ];
+  // const waitingLines = [
+  //   'Hang tight, magic is happening...',
+  //   'Almost there, just a little more...',
+  //   'Transforming your image, stay tuned...',
+  //   'Good things take time, just a moment...',
+  //   'Making it perfect, please wait...',
+  //   'Creating transparency, hold on...',
+  //   "Working on it, won't be long now...",
+  //   'Patience is a virtue, almost done...',
+  //   'Crafting your image, just a bit more...',
+  //   'Preparing the final touch, please stand by...',
+  // ];
 
-  const getRandomLine = () => {
-    return waitingLines[Math.floor(Math.random() * waitingLines.length)];
-  };
+  // const getRandomLine = () => {
+  //   return waitingLines[Math.floor(Math.random() * waitingLines.length)];
+  // };
 
-  useEffect(() => {
-    let interval;
-    if (isLoading) {
-      setLoadingText(getRandomLine());
-      interval = setInterval(() => {
-        setLoadingText(getRandomLine());
-      }, 5000); // Change the line every 5 seconds
-    }
+  // useEffect(() => {
+  //   let interval;
+  //   if (isLoading) {
+  //     setLoadingText(getRandomLine());
+  //     interval = setInterval(() => {
+  //       setLoadingText(getRandomLine());
+  //     }, 5000); // Change the line every 5 seconds
+  //   }
 
-    return () => clearInterval(interval);
-  }, [isLoading]);
+  //   return () => clearInterval(interval);
+  // }, [isLoading]);
 
   const handleImagePicked = uri => {
-    removeBackground(uri, setIsLoading, navigation);
+    // setIsLoading(true);
+    navigation.navigate('Home', {originalImage: uri});
   };
 
   useFocusEffect(
@@ -87,7 +84,8 @@ const ImageUpload = () => {
       {constants.colorScheme === 'dark' && (
         <StatusBar
           backgroundColor={
-            isLoading ? 'rgba(0, 0, 0, 0.8)' : constants.colors.backgroundColor
+            constants.colors.backgroundColor
+            // isLoading ? 'rgba(0, 0, 0, 0.8)' : constants.colors.backgroundColor
           }
           barStyle={
             constants.colorScheme === 'light' ? 'dark-content' : 'light-content'
@@ -126,7 +124,7 @@ const ImageUpload = () => {
           </Text>
         </TouchableOpacity>
 
-        {isLoading && (
+        {/* {isLoading && (
           <View
             style={[
               styles.loadingContainer,
@@ -152,7 +150,7 @@ const ImageUpload = () => {
               {loadingText}
             </Text>
           </View>
-        )}
+        )} */}
       </View>
     </>
   );

@@ -21,14 +21,15 @@ import DiscardChangesModal from '../components/DiscardChangesModal';
 import {mergeBackgroundAndImage} from '../utils/imageSaver';
 import {calculateImageDimensions} from '../utils/imageDimension';
 import BackgroundRenderer from '../components/BackgroundRenderer';
-
+import {removeBackground} from '../utils/removeBackgroundAPI';
+import LottieView from 'lottie-react-native';
 const {width, height} = constants.screen;
 
 const Home = ({route}) => {
   const navigation = useNavigation();
   const viewShotRef = useRef(null);
-  const {originalImage, processedImage} = route.params;
-  const [activeTab, setActiveTab] = useState('Removed');
+  const {originalImage} = route.params;
+  const [activeTab, setActiveTab] = useState('Original');
   const [footerState, setFooterState] = useState('initial');
   const [colorState, setColorState] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState(null);
@@ -39,9 +40,31 @@ const Home = ({route}) => {
   const transitionValue = useRef(new Animated.Value(0)).current;
   const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDoneLoading, setIsDoneLoading] = useState(false);
+  const [processedImage, setProcessedImage] = useState(null);
 
   useEffect(() => {
-    if (!hasTransitioned) {
+    const processImage = async () => {
+      setIsLoading(true);
+      try {
+        const result = await removeBackground(originalImage);
+        setProcessedImage(result);
+        // Trigger the transition after getting the result
+        setHasTransitioned(false);
+      } catch (error) {
+        console.error('Error removing background:', error);
+        ToastAndroid.show('Failed to remove background', ToastAndroid.SHORT);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    processImage();
+  }, [originalImage]);
+
+  useEffect(() => {
+    if (!hasTransitioned && processedImage) {
+      setActiveTab('Removed');
       setTimeout(() => {
         Animated.timing(transitionValue, {
           toValue: 1,
@@ -49,11 +72,10 @@ const Home = ({route}) => {
           useNativeDriver: false,
         }).start(() => {
           setHasTransitioned(true);
-          setActiveTab('Removed');
         });
       }, 250);
     }
-  }, [hasTransitioned, transitionValue]);
+  }, [hasTransitioned, transitionValue, processedImage]);
 
   useEffect(() => {
     calculateImageDimensions(originalImage)
@@ -70,7 +92,6 @@ const Home = ({route}) => {
   }, []);
 
   const handleShareImage = async () => {
-    // Update the button state visually (e.g., by changing opacity, color, etc.)
     setTimeout(async () => {
       let background = '';
       let type = '';
@@ -116,7 +137,7 @@ const Home = ({route}) => {
           ToastAndroid.SHORT,
         );
       } finally {
-        setIsLoading(false);
+        setIsDoneLoading(false);
       }
     }, 10); // 100ms delay to allow UI update
   };
@@ -180,33 +201,39 @@ const Home = ({route}) => {
             style={[styles.image, imageDimensions]}
             resizeMode="contain"
           />
-          <Animated.View
-            style={[
-              StyleSheet.absoluteFill,
-              {
-                flexDirection: 'row',
-                overflow: 'hidden',
-              },
-            ]}>
+          {processedImage && (
             <Animated.View
-              style={{
-                flex: transitionValue,
-                overflow: 'hidden',
-              }}>
-              <Image
-                source={require('../assets/images/square_background.png')}
-                style={[styles.checkeredBackground, imageDimensions]}
-              />
-              <Image
-                source={{uri: processedImage}}
-                style={[styles.image, imageDimensions, StyleSheet.absoluteFill]}
-                resizeMode="contain"
+              style={[
+                StyleSheet.absoluteFill,
+                {
+                  flexDirection: 'row',
+                  overflow: 'hidden',
+                },
+              ]}>
+              <Animated.View
+                style={{
+                  flex: transitionValue,
+                  overflow: 'hidden',
+                }}>
+                <Image
+                  source={require('../assets/images/square_background.png')}
+                  style={[styles.checkeredBackground, imageDimensions]}
+                />
+                <Image
+                  source={{uri: processedImage}}
+                  style={[
+                    styles.image,
+                    imageDimensions,
+                    StyleSheet.absoluteFill,
+                  ]}
+                  resizeMode="contain"
+                />
+              </Animated.View>
+              <Animated.View
+                style={{flex: Animated.subtract(1, transitionValue)}}
               />
             </Animated.View>
-            <Animated.View
-              style={{flex: Animated.subtract(1, transitionValue)}}
-            />
-          </Animated.View>
+          )}
         </View>
       );
     } else if (activeTab === 'Original') {
@@ -238,7 +265,6 @@ const Home = ({route}) => {
     imageDimensions,
     transitionValue,
   ]);
-
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
@@ -259,7 +285,7 @@ const Home = ({route}) => {
           <TouchableOpacity
             style={styles.shareButton}
             onPress={() => {
-              setIsLoading(true);
+              setIsDoneLoading(true);
               handleShareImage();
             }}
             disabled={isLoading}>
@@ -278,7 +304,7 @@ const Home = ({route}) => {
             style={[
               styles.image,
               imageDimensions,
-              {borderWidth: 1, borderColor: 'grey'},
+              {borderWidth: 1, borderColor: '#C0C0C0'},
             ]}>
             {renderContent()}
           </ViewShot>
@@ -296,7 +322,17 @@ const Home = ({route}) => {
       </View>
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator color={constants.colors.primary} size={40} />
+          <LottieView
+            source={require('../assets/animation/loading.json')}
+            autoPlay
+            loop
+            style={styles.lottieAnimation}
+          />
+        </View>
+      )}
+      {isDoneLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size={35} color={constants.colors.primary} />
         </View>
       )}
       <DiscardChangesModal
@@ -378,7 +414,10 @@ const styles = StyleSheet.create({
       constants.colorScheme === 'light'
         ? 'rgba(255, 255, 255, 0.8)'
         : 'rgba(0, 0, 0, 0.8)',
-    zIndex: 10, // Ensure it appears above all other content
+  },
+  lottieAnimation: {
+    width: 200,
+    height: 200,
   },
 });
 

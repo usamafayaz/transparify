@@ -73,9 +73,9 @@ const ShareToSocial = ({route, navigation}) => {
       }
 
       const shareOptions = {
-        title: 'Share Transparify Image',
+        title: 'Share Image',
         message:
-          "Check out this awesome image I created with the Transparify app! It's amazing for removing backgrounds and creating transparent images. Try it yourself!",
+          'Check out this awesome image I created with the Transparify app!',
         url: imageUri,
         type: 'image/png',
       };
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: height * 0.05,
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: '#C0C0C0',
     borderRadius: 7,
     overflow: 'hidden',
   },

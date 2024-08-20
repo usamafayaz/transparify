@@ -14,8 +14,7 @@ public class MainActivity extends ReactActivity {
   protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
         SplashScreen.show(this);  // Show splash screen
-
-        super.onCreate(savedInstanceState);
+        super.onCreate(null);
     }
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
