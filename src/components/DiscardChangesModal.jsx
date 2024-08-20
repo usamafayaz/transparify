@@ -20,18 +20,24 @@ const DiscardChangesModal = ({visible, onClose, onDiscard}) => {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalBackground}>
           <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Discard Changes?</Text>
-            <Text style={styles.modalMessage}>
+            <Text style={styles.modalTitle} allowFontScaling={false}>
+              Discard Changes?
+            </Text>
+            <Text style={styles.modalMessage} allowFontScaling={false}>
               Are you sure you want to discard your changes?
             </Text>
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText} allowFontScaling={false}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.discardButton}
                 onPress={onDiscard}>
-                <Text style={styles.discardButtonText}>Discard</Text>
+                <Text style={styles.discardButtonText} allowFontScaling={false}>
+                  Discard
+                </Text>
               </TouchableOpacity>
             </View>
           </View>

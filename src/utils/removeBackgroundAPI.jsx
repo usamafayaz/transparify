@@ -20,6 +20,7 @@ export const removeBackground = async uri => {
     });
 
     const imageBlob = await response.blob();
+    console.log('Background API Called !');
 
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

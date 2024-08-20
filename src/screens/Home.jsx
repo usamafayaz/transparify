@@ -1,5 +1,3 @@
-// src/screens/Home.js
-
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   Image,
@@ -283,13 +281,13 @@ const Home = ({route}) => {
         </View>
         {activeTab !== 'Original' && (
           <TouchableOpacity
-            style={styles.shareButton}
+            style={styles.doneButton}
             onPress={() => {
               setIsDoneLoading(true);
               handleShareImage();
             }}
             disabled={isLoading}>
-            <Text style={styles.shareButtonText} allowFontScaling={false}>
+            <Text style={styles.doneButtonText} allowFontScaling={false}>
               Done
             </Text>
           </TouchableOpacity>
@@ -323,7 +321,11 @@ const Home = ({route}) => {
       {isLoading && (
         <View style={styles.loadingContainer}>
           <LottieView
-            source={require('../assets/animation/loading.json')}
+            source={
+              constants.colorScheme === 'dark'
+                ? require('../assets/animation/loading_dark.json')
+                : require('../assets/animation/loading_light.json')
+            }
             autoPlay
             loop
             style={styles.lottieAnimation}
@@ -366,7 +368,7 @@ const styles = StyleSheet.create({
     marginLeft: width * 0.05,
     color: constants.colors.textSecondary,
   },
-  shareButton: {
+  doneButton: {
     backgroundColor: constants.colors.primary,
     borderRadius: 20,
     height: height * 0.048,
@@ -374,7 +376,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shareButtonText: {
+  doneButtonText: {
     color: constants.colors.white,
     fontSize: constants.fontSizes.small,
   },
@@ -412,7 +414,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor:
       constants.colorScheme === 'light'
-        ? 'rgba(255, 255, 255, 0.8)'
+        ? 'rgba(255, 255, 255, 0.5)'
         : 'rgba(0, 0, 0, 0.8)',
   },
   lottieAnimation: {

@@ -40,7 +40,9 @@ const IconButton = React.memo(({onPress, icon, text}) => (
       style={[styles.iconStyle, text === 'Share' && {width: 20, height: 20}]}
       tintColor={constants.colors.textPrimary}
     />
-    <Text style={styles.iconText}>{text}</Text>
+    <Text style={styles.iconText} allowFontScaling={false}>
+      {text}
+    </Text>
   </TouchableOpacity>
 ));
 

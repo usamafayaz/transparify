@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   Image,
   StyleSheet,
@@ -17,40 +17,9 @@ const {height, width} = constants.screen;
 
 const ImageUpload = () => {
   const [backPressCount, setBackPressCount] = useState(0);
-  // const [loadingText, setLoadingText] = useState('');
   const navigation = useNavigation();
 
-  // const waitingLines = [
-  //   'Hang tight, magic is happening...',
-  //   'Almost there, just a little more...',
-  //   'Transforming your image, stay tuned...',
-  //   'Good things take time, just a moment...',
-  //   'Making it perfect, please wait...',
-  //   'Creating transparency, hold on...',
-  //   "Working on it, won't be long now...",
-  //   'Patience is a virtue, almost done...',
-  //   'Crafting your image, just a bit more...',
-  //   'Preparing the final touch, please stand by...',
-  // ];
-
-  // const getRandomLine = () => {
-  //   return waitingLines[Math.floor(Math.random() * waitingLines.length)];
-  // };
-
-  // useEffect(() => {
-  //   let interval;
-  //   if (isLoading) {
-  //     setLoadingText(getRandomLine());
-  //     interval = setInterval(() => {
-  //       setLoadingText(getRandomLine());
-  //     }, 5000); // Change the line every 5 seconds
-  //   }
-
-  //   return () => clearInterval(interval);
-  // }, [isLoading]);
-
   const handleImagePicked = uri => {
-    // setIsLoading(true);
     navigation.navigate('Home', {originalImage: uri});
   };
 
@@ -81,17 +50,6 @@ const ImageUpload = () => {
 
   return (
     <>
-      {constants.colorScheme === 'dark' && (
-        <StatusBar
-          backgroundColor={
-            constants.colors.backgroundColor
-            // isLoading ? 'rgba(0, 0, 0, 0.8)' : constants.colors.backgroundColor
-          }
-          barStyle={
-            constants.colorScheme === 'light' ? 'dark-content' : 'light-content'
-          }
-        />
-      )}
       <View style={styles.container}>
         <Image
           source={require('../assets/images/transform.png')}
@@ -123,34 +81,6 @@ const ImageUpload = () => {
             Gallery
           </Text>
         </TouchableOpacity>
-
-        {/* {isLoading && (
-          <View
-            style={[
-              styles.loadingContainer,
-              {
-                backgroundColor:
-                  constants.colorScheme === 'light'
-                    ? 'rgba(255, 255, 255, 0.8)'
-                    : 'rgba(0, 0, 0, 0.8)',
-              },
-            ]}>
-            <LottieView
-              source={require('../assets/animation/loading.json')}
-              autoPlay
-              loop
-              style={styles.lottieAnimation}
-            />
-            <Text
-              style={[
-                styles.loadingText,
-                {fontSize: constants.fontSizes.medium},
-              ]}
-              allowFontScaling={false}>
-              {loadingText}
-            </Text>
-          </View>
-        )} */}
       </View>
     </>
   );
@@ -196,24 +126,6 @@ const styles = StyleSheet.create({
     fontSize: constants.fontSizes.medium,
     fontWeight: '600',
     marginLeft: width * 0.02,
-  },
-  loadingContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 16,
-    color: constants.colors.textSecondary,
-    marginTop: 10,
-  },
-  lottieAnimation: {
-    width: 200,
-    height: 200,
   },
 });
 

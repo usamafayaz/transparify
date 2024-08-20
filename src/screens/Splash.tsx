@@ -16,13 +16,17 @@ const Splash = () => {
   const progressBarWidth = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    let isMounted = true; // Track component mount state
+
     const animateProgressBar = () => {
       Animated.timing(progressBarWidth, {
         toValue: 1,
         duration: 2000,
         useNativeDriver: false,
       }).start(() => {
-        checkFirstLaunch();
+        if (isMounted) {
+          checkFirstLaunch();
+        }
       });
     };
 
@@ -31,19 +35,23 @@ const Splash = () => {
         const isFirstLaunch = await AsyncStorage.getItem('hasLaunched');
         if (isFirstLaunch === null) {
           await AsyncStorage.setItem('hasLaunched', 'true');
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{name: 'Welcome'}],
-            }),
-          );
+          if (isMounted) {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{name: 'Welcome'}],
+              }),
+            );
+          }
         } else {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{name: 'Image Upload'}],
-            }),
-          );
+          if (isMounted) {
+            navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{name: 'Image Upload'}],
+              }),
+            );
+          }
         }
       } catch (error) {
         console.error('Error checking first launch:', error);
@@ -51,6 +59,11 @@ const Splash = () => {
     };
 
     animateProgressBar();
+
+    return () => {
+      isMounted = false; // Cleanup on unmount
+      progressBarWidth.stopAnimation(); // Stop animation if it's still running
+    };
   }, []);
 
   return (
