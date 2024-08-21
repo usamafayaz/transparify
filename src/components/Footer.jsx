@@ -36,7 +36,17 @@ const Footer = ({
   const renderColorOption = ({item}) => (
     <TouchableOpacity
       disabled={activeTab === 'Original' ? true : false}
-      style={[styles.footerButton, {backgroundColor: item}]}
+      style={[
+        styles.footerButton,
+        {
+          backgroundColor: item,
+          borderColor:
+            constants.colorScheme == 'dark'
+              ? 'rgba(255,255,255,0)'
+              : 'rgba(0,0,0,0.2)',
+          borderWidth: 1,
+        },
+      ]}
       onPress={() => handleColorSelect(item)}
     />
   );
@@ -45,7 +55,19 @@ const Footer = ({
     <TouchableOpacity
       disabled={activeTab === 'Original' ? true : false}
       onPress={() => handleColorSelect(item)}>
-      <LinearGradient colors={item} style={styles.footerButton} />
+      <LinearGradient
+        colors={item}
+        style={[
+          styles.footerButton,
+          {
+            borderColor:
+              constants.colorScheme == 'dark'
+                ? 'rgba(255,255,255,0)'
+                : 'rgba(0,0,0,0.2)',
+            borderWidth: 1,
+          },
+        ]}
+      />
     </TouchableOpacity>
   );
 
@@ -94,7 +116,7 @@ const Footer = ({
               clearBackground();
             }}>
             <Image
-              source={require('../assets/icons/transparency.png')}
+              source={require('../assets/icons/clear.png')}
               style={styles.footerIcon}
             />
             <Text style={styles.footerButtonText} allowFontScaling={false}>
@@ -110,7 +132,8 @@ const Footer = ({
             onPress={() => updateFooter('initial')}>
             <Image
               source={require('../assets/icons/back.png')}
-              style={styles.footerIcon}
+              style={[styles.footerIcon, {opacity: 0.8}]}
+              tintColor={constants.colors.textPrimary}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -151,6 +174,7 @@ const Footer = ({
             <Image
               source={require('../assets/icons/back.png')}
               style={styles.footerIcon}
+              tintColor={constants.colors.textPrimary}
             />
           </TouchableOpacity>
           {/* {colorState === 'solid' && (
@@ -222,13 +246,13 @@ const styles = StyleSheet.create({
     height: width * 0.16,
     width: width * 0.16,
     justifyContent: 'center',
-    borderRadius: 10,
+    borderRadius: 5,
     alignItems: 'center',
     marginHorizontal: width * 0.02,
   },
   footerIcon: {
-    width: width * 0.08,
-    height: width * 0.08,
+    width: width * 0.07,
+    height: width * 0.07,
     marginBottom: 4,
   },
   footerButtonText: {

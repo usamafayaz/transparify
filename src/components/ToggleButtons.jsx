@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.toggleButtonBackground,
     flexDirection: 'row',
     borderRadius: width * 0.4,
-    paddingHorizontal: '1%',
-    paddingVertical: '2%',
+    paddingHorizontal: '0.7%',
+    paddingVertical: '1.7%',
     position: 'relative',
   },
   toggleButton: {

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo, useCallback} from 'react';
+import React, {useMemo, useCallback} from 'react';
 import {
   Image,
   StyleSheet,
@@ -10,26 +10,28 @@ import {
 import RNFS from 'react-native-fs';
 import constants from '../config/constants';
 import Permissions from '../utils/permissions';
-import {calculateImageDimensions} from '../utils/imageDimension';
 import Share from 'react-native-share';
 
 const {width, height} = constants.screen;
 
 const TopBar = React.memo(({onBackPress}) => (
   <View style={styles.topBar}>
-    <View style={styles.leftHalfTopBar}>
-      <TouchableOpacity onPress={onBackPress}>
-        <Image
-          resizeMode="contain"
-          source={require('../assets/icons/left_arrow.png')}
-          style={styles.smallIconStyle}
-          tintColor={constants.colors.textSecondary}
-        />
-      </TouchableOpacity>
-      <Text style={styles.topBarText} allowFontScaling={false}>
-        Transparify
-      </Text>
-    </View>
+    <TouchableOpacity onPress={onBackPress}>
+      <Image
+        resizeMode="contain"
+        source={require('../assets/icons/left_arrow.png')}
+        style={styles.iconStyle}
+        tintColor={constants.colors.textSecondary}
+      />
+    </TouchableOpacity>
+    <TouchableOpacity onPress={onBackPress}>
+      <Image
+        resizeMode="contain"
+        source={require('../assets/icons/invite.png')}
+        style={[styles.iconStyle, {height: height * 0.06, width: width * 0.06}]}
+        tintColor={constants.colors.textSecondary}
+      />
+    </TouchableOpacity>
   </View>
 ));
 
@@ -37,7 +39,7 @@ const IconButton = React.memo(({onPress, icon, text}) => (
   <TouchableOpacity onPress={onPress} style={styles.iconContainer}>
     <Image
       source={icon}
-      style={[styles.iconStyle, text === 'Share' && {width: 20, height: 20}]}
+      style={[styles.iconStyle, {height: height * 0.06, width: width * 0.06}]}
       tintColor={constants.colors.textPrimary}
     />
     <Text style={styles.iconText} allowFontScaling={false}>
@@ -47,23 +49,12 @@ const IconButton = React.memo(({onPress, icon, text}) => (
 ));
 
 const ShareToSocial = ({route, navigation}) => {
-  const {mergedImage, noBackground} = route.params;
-  const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
-
-  useEffect(() => {
-    const imageUri = noBackground ? mergedImage : `file://${mergedImage}`;
-    calculateImageDimensions(imageUri)
-      .then(setImageDimensions)
-      .catch(error =>
-        console.error('Error calculating image dimensions:', error),
-      );
-  }, [mergedImage, noBackground]);
+  const {mergedImage, noBackground, imageDimensions} = route.params;
 
   const handleShare = useCallback(async () => {
     let tempFilePath = null;
     try {
       let imageUri = mergedImage;
-
       if (noBackground) {
         tempFilePath = `${
           RNFS.CachesDirectoryPath
@@ -81,7 +72,6 @@ const ShareToSocial = ({route, navigation}) => {
         url: imageUri,
         type: 'image/png',
       };
-
       const shareResponse = await Share.open(shareOptions);
       console.log('Share response:', shareResponse);
       ToastAndroid.show('Image shared successfully!', ToastAndroid.SHORT);
@@ -158,6 +148,10 @@ const ShareToSocial = ({route, navigation}) => {
       <View style={styles.contentContainer}>
         <View style={[styles.imageContainer, imageDimensions]}>
           <Image
+            source={require('../assets/images/square_background.png')}
+            style={[styles.checkeredBackground, imageDimensions]}
+          />
+          <Image
             source={imageSource}
             style={[styles.processedImage, imageDimensions]}
             resizeMode="contain"
@@ -171,7 +165,7 @@ const ShareToSocial = ({route, navigation}) => {
           />
           <IconButton
             onPress={handleShare}
-            icon={require('../assets/icons/send.png')}
+            icon={require('../assets/icons/share.png')}
             text="Share"
           />
         </View>
@@ -186,23 +180,10 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.backgroundColor,
   },
   topBar: {
-    height: height * 0.1,
     flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: width * 0.06,
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: width * 0.05,
-    marginTop: height * 0.0007,
-  },
-  leftHalfTopBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  topBarText: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: constants.colors.textSecondary,
-    marginLeft: width * 0.05,
   },
   contentContainer: {
     flex: 1,
@@ -240,8 +221,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconStyle: {
-    height: 25,
-    width: 25,
+    height: height * 0.08,
+    width: width * 0.08,
     resizeMode: 'contain',
     marginRight: 8,
   },
@@ -249,10 +230,8 @@ const styles = StyleSheet.create({
     fontSize: constants.fontSizes.small,
     color: constants.colors.textPrimary,
   },
-  smallIconStyle: {
-    height: height * 0.08,
-    width: width * 0.08,
-    resizeMode: 'contain',
+  checkeredBackground: {
+    ...StyleSheet.absoluteFill,
   },
 });
 

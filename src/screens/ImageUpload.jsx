@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
   mainImageStyle: {
     width: '80%',
     height: '40%',
+    marginLeft: 20,
   },
   iconStyle: {
     width: 30,
@@ -110,7 +111,7 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   buttonContainer: {
-    width: width * 0.85,
+    width: width * 0.75,
     backgroundColor: constants.colors.buttonBackground,
     borderRadius: 40,
     paddingVertical: height * 0.013,

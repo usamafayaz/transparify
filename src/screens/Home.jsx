@@ -2,7 +2,6 @@ import React, {useState, useEffect, useRef, useCallback} from 'react';
 import {
   Image,
   StyleSheet,
-  Text,
   View,
   TouchableOpacity,
   Animated,
@@ -38,14 +37,14 @@ const Home = ({route}) => {
   const transitionValue = useRef(new Animated.Value(0)).current;
   const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDoneLoading, setIsDoneLoading] = useState(false);
+  const [isNextLoading, setIsNextLoading] = useState(false);
   const [processedImage, setProcessedImage] = useState(null);
 
   useEffect(() => {
     const processImage = async () => {
       setIsLoading(true);
       try {
-        const result = await removeBackground(originalImage);
+        const result = await removeBackground(originalImage, navigation);
         setProcessedImage(result);
         // Trigger the transition after getting the result
         setHasTransitioned(false);
@@ -113,6 +112,7 @@ const Home = ({route}) => {
           navigation.navigate('ShareToSocial', {
             mergedImage: processedImage,
             noBackground: true,
+            imageDimensions,
           });
           setIsLoading(false);
           return;
@@ -126,6 +126,7 @@ const Home = ({route}) => {
           navigation.navigate('ShareToSocial', {
             mergedImage: result,
             noBackground: false,
+            imageDimensions,
           });
         }
       } catch (error) {
@@ -135,7 +136,7 @@ const Home = ({route}) => {
           ToastAndroid.SHORT,
         );
       } finally {
-        setIsDoneLoading(false);
+        setIsNextLoading(false);
       }
     }, 10); // 100ms delay to allow UI update
   };
@@ -266,30 +267,31 @@ const Home = ({route}) => {
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <View style={styles.leftHalfTopBar}>
-          <TouchableOpacity onPress={() => setIsDiscardModalVisible(true)}>
-            <Image
-              resizeMode="contain"
-              source={require('../assets/icons/left_arrow.png')}
-              style={styles.iconStyle}
-              tintColor={constants.colors.textSecondary}
-            />
-          </TouchableOpacity>
-          <Text style={styles.topBarText} allowFontScaling={false}>
-            Transparify
-          </Text>
-        </View>
+        <TouchableOpacity onPress={() => setIsDiscardModalVisible(true)}>
+          <Image
+            resizeMode="contain"
+            source={require('../assets/icons/left_arrow.png')}
+            style={styles.iconStyle}
+            tintColor={constants.colors.textSecondary}
+          />
+        </TouchableOpacity>
         {activeTab !== 'Original' && (
           <TouchableOpacity
-            style={styles.doneButton}
+            style={styles.rightArrow}
             onPress={() => {
-              setIsDoneLoading(true);
+              setIsNextLoading(true);
               handleShareImage();
             }}
-            disabled={isLoading}>
-            <Text style={styles.doneButtonText} allowFontScaling={false}>
-              Done
-            </Text>
+            disabled={isNextLoading}>
+            <Image
+              resizeMode="contain"
+              source={require('../assets/icons/right_arrow.png')}
+              style={[
+                styles.iconStyle,
+                {height: height * 0.07, width: width * 0.07},
+              ]}
+              tintColor={constants.colors.white}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -332,7 +334,7 @@ const Home = ({route}) => {
           />
         </View>
       )}
-      {isDoneLoading && (
+      {isNextLoading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size={35} color={constants.colors.primary} />
         </View>
@@ -352,37 +354,23 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.backgroundColor,
   },
   topBar: {
-    height: height * 0.1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: width * 0.05,
+    paddingHorizontal: width * 0.06,
+    justifyContent: 'space-between',
   },
-  leftHalfTopBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  topBarText: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    marginLeft: width * 0.05,
-    color: constants.colors.textSecondary,
-  },
-  doneButton: {
+  rightArrow: {
+    height: width * 0.09,
+    width: width * 0.09,
     backgroundColor: constants.colors.primary,
     borderRadius: 20,
-    height: height * 0.048,
-    width: width * 0.2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  doneButtonText: {
-    color: constants.colors.white,
-    fontSize: constants.fontSizes.small,
   },
   contentContainer: {
     flex: 1,
     alignItems: 'center',
+    marginTop: 5,
   },
   imageContainer: {
     flex: 1,
@@ -397,11 +385,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   checkeredBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFill,
   },
   iconStyle: {
     height: height * 0.08,

@@ -1,6 +1,6 @@
 import {ToastAndroid} from 'react-native';
 import apiUrl from '../config/apiUrl';
-export const removeBackground = async uri => {
+export const removeBackground = async (uri, navigation) => {
   const formData = new FormData();
   formData.append('image', {
     uri: uri,
@@ -29,6 +29,7 @@ export const removeBackground = async uri => {
       reader.readAsDataURL(imageBlob);
     });
   } catch (error) {
+    navigation.goBack();
     ToastAndroid.show(
       'Please check your internet connection and try again.',
       ToastAndroid.SHORT,
