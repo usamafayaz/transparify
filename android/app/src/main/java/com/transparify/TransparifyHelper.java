@@ -86,7 +86,7 @@ public class TransparifyHelper extends ReactContextBaseJavaModule {
             canvas.drawBitmap(originalBitmap, 0, 0, null);
 
             File outputDir = reactContext.getCacheDir();
-            File outputFile = File.createTempFile("merged_image", ".png", outputDir);
+            File outputFile = File.createTempFile("tnspym", ".png", outputDir);
             FileOutputStream fos = new FileOutputStream(outputFile);
             resultBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.close();

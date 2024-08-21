@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Image,
   StyleSheet,
@@ -13,26 +13,26 @@ import ViewShot from 'react-native-view-shot';
 import ToggleButtons from '../components/ToggleButtons';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import DiscardChangesModal from '../components/DiscardChangesModal';
-import {mergeBackgroundAndImage} from '../utils/imageSaver';
-import {calculateImageDimensions} from '../utils/imageDimension';
+import { mergeBackgroundAndImage } from '../utils/imageSaver';
+import { calculateImageDimensions } from '../utils/imageDimension';
 import BackgroundRenderer from '../components/BackgroundRenderer';
-import {removeBackground} from '../utils/removeBackgroundAPI';
+import { removeBackground } from '../utils/removeBackgroundAPI';
 import LottieView from 'lottie-react-native';
-const {width, height} = constants.screen;
+const { width, height } = constants.screen;
 
-const Home = ({route}) => {
+const Home = ({ route }) => {
   const navigation = useNavigation();
   const viewShotRef = useRef(null);
-  const {originalImage} = route.params;
+  const { originalImage } = route.params;
   const [activeTab, setActiveTab] = useState('Original');
   const [footerState, setFooterState] = useState('initial');
   const [colorState, setColorState] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState(null);
   const [selectedGradient, setSelectedGradient] = useState(null);
   const [selectedBackgroundImage, setSelectedBackgroundImage] = useState(null);
-  const [imageDimensions, setImageDimensions] = useState({width: 0, height: 0});
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [hasTransitioned, setHasTransitioned] = useState(false);
   const transitionValue = useRef(new Animated.Value(0)).current;
   const [isDiscardModalVisible, setIsDiscardModalVisible] = useState(false);
@@ -46,7 +46,6 @@ const Home = ({route}) => {
       try {
         const result = await removeBackground(originalImage, navigation);
         setProcessedImage(result);
-        // Trigger the transition after getting the result
         setHasTransitioned(false);
       } catch (error) {
         console.error('Error removing background:', error);
@@ -55,7 +54,6 @@ const Home = ({route}) => {
         setIsLoading(false);
       }
     };
-
     processImage();
   }, [originalImage]);
 
@@ -196,7 +194,7 @@ const Home = ({route}) => {
       return (
         <View style={[styles.image, imageDimensions]}>
           <Image
-            source={{uri: originalImage}}
+            source={{ uri: originalImage }}
             style={[styles.image, imageDimensions]}
             resizeMode="contain"
           />
@@ -219,7 +217,7 @@ const Home = ({route}) => {
                   style={[styles.checkeredBackground, imageDimensions]}
                 />
                 <Image
-                  source={{uri: processedImage}}
+                  source={{ uri: processedImage }}
                   style={[
                     styles.image,
                     imageDimensions,
@@ -229,7 +227,7 @@ const Home = ({route}) => {
                 />
               </Animated.View>
               <Animated.View
-                style={{flex: Animated.subtract(1, transitionValue)}}
+                style={{ flex: Animated.subtract(1, transitionValue) }}
               />
             </Animated.View>
           )}
@@ -238,7 +236,7 @@ const Home = ({route}) => {
     } else if (activeTab === 'Original') {
       return (
         <Image
-          source={{uri: originalImage}}
+          source={{ uri: originalImage }}
           style={[styles.image, imageDimensions]}
           resizeMode="contain"
         />
@@ -288,7 +286,7 @@ const Home = ({route}) => {
               source={require('../assets/icons/right_arrow.png')}
               style={[
                 styles.iconStyle,
-                {height: height * 0.07, width: width * 0.07},
+                { height: height * 0.07, width: width * 0.07 },
               ]}
               tintColor={constants.colors.white}
             />
@@ -300,11 +298,11 @@ const Home = ({route}) => {
         <View style={styles.imageContainer}>
           <ViewShot
             ref={viewShotRef}
-            options={{...imageDimensions, quality: 1, format: 'png'}}
+            options={{ ...imageDimensions, quality: 1, format: 'png' }}
             style={[
               styles.image,
               imageDimensions,
-              {borderWidth: 1, borderColor: '#C0C0C0'},
+              { borderWidth: 1, borderColor: '#C0C0C0' },
             ]}>
             {renderContent()}
           </ViewShot>
