@@ -18,7 +18,16 @@ const DiscardChangesModal = ({visible, onClose, onDiscard}) => {
       animationType="fade"
       onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.modalBackground}>
+        <View
+          style={[
+            styles.modalBackground,
+            {
+              backgroundColor:
+                constants.colorScheme == 'dark'
+                  ? 'rgba(0, 0, 0, 0.8)'
+                  : 'rgba(0, 0, 0, 0.1)',
+            },
+          ]}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle} allowFontScaling={false}>
               Discard Changes?
@@ -27,13 +36,15 @@ const DiscardChangesModal = ({visible, onClose, onDiscard}) => {
               Are you sure you want to discard your changes?
             </Text>
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
+              <TouchableOpacity
+                style={styles.cancelDiscardButton}
+                onPress={onClose}>
                 <Text style={styles.cancelButtonText} allowFontScaling={false}>
                   Cancel
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.discardButton}
+                style={styles.cancelDiscardButton}
                 onPress={onDiscard}>
                 <Text style={styles.discardButtonText} allowFontScaling={false}>
                   Discard
@@ -52,7 +63,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     width: '80%',
@@ -73,23 +83,21 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
+    marginTop: '2%',
   },
-  cancelButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  cancelDiscardButton: {
+    width: '25%',
+    height: 30,
   },
   cancelButtonText: {
     color: constants.colors.textSecondary,
-  },
-  discardButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: constants.colors.primary,
-    borderRadius: 5,
+    fontSize: constants.fontSizes.small,
   },
   discardButtonText: {
-    color: constants.colors.white,
+    color: constants.colors.primary,
+    fontSize: constants.fontSizes.small,
+    fontWeight: 'bold',
   },
 });
 

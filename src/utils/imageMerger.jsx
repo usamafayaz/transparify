@@ -1,8 +1,9 @@
-import { NativeModules } from 'react-native';
-const { TransparifyHelper } = NativeModules;
+import {NativeModules} from 'react-native';
+const {TransparifyHelper} = NativeModules;
 import RNFS from 'react-native-fs';
 
 export const mergeBackgroundAndImage = (
+  originalImage,
   processedImage,
   background,
   backgroundType,
@@ -11,14 +12,14 @@ export const mergeBackgroundAndImage = (
     try {
       const base64Image = processedImage.split(',')[1];
       if (backgroundType === 'color') {
-        backgroundData = { type: 'color', color: background };
+        backgroundData = {type: 'color', color: background};
       } else if (backgroundType === 'gradient') {
         backgroundData = {
           type: 'gradient',
-          gradient: { startColor: background[0], endColor: background[1] },
+          gradient: {startColor: background[0], endColor: background[1]},
         };
       } else if (backgroundType === 'image') {
-        backgroundData = { type: 'image', uri: background };
+        backgroundData = {type: 'image', uri: background};
       }
 
       const cacheDir = RNFS.CachesDirectoryPath;
@@ -26,7 +27,14 @@ export const mergeBackgroundAndImage = (
         .then(async res => {
           const oldFiles = await RNFS.readDir(cacheDir);
           let filePaths = oldFiles.map(file => file.path);
-          filePaths = filePaths.filter((path) => path.includes('tnspym') && path !== res);
+          filePaths = filePaths.filter(path => {
+            return (
+              (path.includes('tnspym') ||
+                path.includes('rn_image_picker_lib_temp_')) &&
+              path !== res &&
+              path !== originalImage
+            );
+          });
           await Promise.all(filePaths.map(path => RNFS.unlink(path)));
           resolve(res);
         })
