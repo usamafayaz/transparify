@@ -8,14 +8,16 @@ import {
   BackHandler,
   ToastAndroid,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
+import RNFS from 'react-native-fs';
 import ViewShot from 'react-native-view-shot';
 import ToggleButtons from '../components/ToggleButtons';
 import Footer from '../components/Footer';
 import constants from '../config/constants';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import DiscardChangesModal from '../components/DiscardChangesModal';
-import {mergeBackgroundAndImage} from '../utils/imageSaver';
+import {mergeBackgroundAndImage} from '../utils/imageMerger';
 import {calculateImageDimensions} from '../utils/imageDimension';
 import BackgroundRenderer from '../components/BackgroundRenderer';
 import {removeBackground} from '../utils/removeBackgroundAPI';
@@ -46,7 +48,6 @@ const Home = ({route}) => {
       try {
         const result = await removeBackground(originalImage, navigation);
         setProcessedImage(result);
-        // Trigger the transition after getting the result
         setHasTransitioned(false);
       } catch (error) {
         console.error('Error removing background:', error);
@@ -55,7 +56,6 @@ const Home = ({route}) => {
         setIsLoading(false);
       }
     };
-
     processImage();
   }, [originalImage]);
 
@@ -65,7 +65,7 @@ const Home = ({route}) => {
       setTimeout(() => {
         Animated.timing(transitionValue, {
           toValue: 1,
-          duration: 1500,
+          duration: 1500, // duration for removing the bg animation
           useNativeDriver: false,
         }).start(() => {
           setHasTransitioned(true);
@@ -109,6 +109,23 @@ const Home = ({route}) => {
 
       try {
         if (type === 'nobackground' && background === '') {
+          const cacheDir = RNFS.CachesDirectoryPath;
+          const oldFiles = await RNFS.readDir(cacheDir);
+          let filePaths = oldFiles.map(file => file.path);
+          console.log('All Files: ', filePaths);
+          console.log('originalImage: ', originalImage);
+
+          filePaths = filePaths.filter(
+            path =>
+              path.includes('rn_image_picker_lib_temp_') &&
+              path !== originalImage.replace('file://', ''),
+          );
+          await Promise.all(filePaths.map(path => RNFS.unlink(path)));
+
+          const oldFiless = await RNFS.readDir(cacheDir);
+          let filePathss = oldFiless.map(file => file.path);
+          console.log('After deletion Files: ', filePathss);
+
           navigation.navigate('ShareToSocial', {
             mergedImage: processedImage,
             noBackground: true,
@@ -117,7 +134,9 @@ const Home = ({route}) => {
           setIsLoading(false);
           return;
         }
+
         const result = await mergeBackgroundAndImage(
+          originalImage.replace('file://', ''),
           processedImage,
           background,
           type,
@@ -266,6 +285,18 @@ const Home = ({route}) => {
   ]);
   return (
     <View style={styles.container}>
+      {(isDiscardModalVisible || isNextLoading || isLoading) && (
+        <StatusBar
+          barStyle={
+            constants.colorScheme == 'dark' ? 'light-content' : 'dark-content'
+          }
+          backgroundColor={
+            constants.colorScheme == 'dark'
+              ? 'rgba(0, 0, 0, 0.8)'
+              : 'rgba(0, 0, 0, 0.1)'
+          }
+        />
+      )}
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => setIsDiscardModalVisible(true)}>
           <Image
@@ -297,6 +328,7 @@ const Home = ({route}) => {
       </View>
       <View style={styles.contentContainer}>
         <ToggleButtons activeTab={activeTab} setActiveTab={setActiveTab} />
+
         <View style={styles.imageContainer}>
           <ViewShot
             ref={viewShotRef}
@@ -398,7 +430,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor:
       constants.colorScheme === 'light'
-        ? 'rgba(255, 255, 255, 0.5)'
+        ? 'rgba(0, 0, 0, 0.1)'
         : 'rgba(0, 0, 0, 0.8)',
   },
   lottieAnimation: {
