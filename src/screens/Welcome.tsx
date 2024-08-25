@@ -49,6 +49,9 @@ const styles = StyleSheet.create({
   },
   imageStyle: {
     marginTop: height * 0.3,
+    marginBottom: height * 0.01,
+    height: width * 0.2,
+    width: width * 0.2,
   },
   titleStyle: {
     fontSize: constants.fontSizes.xlarge,
@@ -70,7 +73,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.2,
     alignItems: 'center',
     shadowColor: '#202455',
-    elevation: 5,
+    elevation: constants.colorScheme == 'dark' ? 0 : 5,
   },
   buttonText: {
     color: constants.colors.white,

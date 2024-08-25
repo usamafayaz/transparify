@@ -49,16 +49,21 @@ const ColorPickerModal = ({visible, onCancel, onColorSelected}) => {
                 />
               </View>
               <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={handleColorSelection}>
-                  <Text style={styles.buttonText} allowFontScaling={false}>
-                    Select
-                  </Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={onCancel}>
                   <Text style={styles.buttonText} allowFontScaling={false}>
                     Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleColorSelection}>
+                  <Text
+                    style={[
+                      styles.buttonText,
+                      {color: constants.colors.textPrimary},
+                    ]}
+                    allowFontScaling={false}>
+                    Select
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -78,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    backgroundColor: constants.colors.primary,
+    backgroundColor: constants.colors.backgroundColor,
     padding: 20,
     borderRadius: 10,
     alignItems: 'center',
@@ -108,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   buttonText: {
-    color: constants.colors.primary,
+    color: constants.colors.textSecondary,
     fontSize: constants.fontSizes.small,
   },
 });

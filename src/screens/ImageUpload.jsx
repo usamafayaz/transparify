@@ -119,8 +119,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: constants.colors.black,
-    elevation: 1,
+    shadowColor: constants.colors.primary,
+    elevation: constants.colorScheme === 'dark' ? 0 : 1,
   },
   buttonText: {
     color: constants.colors.textPrimary,

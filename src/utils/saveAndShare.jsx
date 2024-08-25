@@ -95,7 +95,7 @@ export const useShareAndInvite = (mergedImage, noBackground) => {
       const shareResponse = await Share.shareSingle(shareOptions);
       console.log('WhatsApp share response:', shareResponse);
     } catch (error) {
-      console.error('Error sharing on WhatsApp:', error);
+      console.log('Error sharing on WhatsApp:', error);
       ToastAndroid.show(
         'Failed to share image on WhatsApp.',
         ToastAndroid.SHORT,
