@@ -12,12 +12,26 @@ const options = {
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
 
+const VALID_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png'];
+
 const showSizeExceededAlert = () => {
   Alert.alert(
     'Image size exceeded',
     'Please select an image smaller than 10 MB.',
     [{text: 'OK', onPress: () => console.log('OK Pressed')}],
   );
+};
+
+const showUnsupportedFormatAlert = () => {
+  Alert.alert(
+    'Unsupported File Format',
+    'Please select an image in JPG, JPEG, or PNG format.',
+    [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+  );
+};
+
+const getFileExtension = uri => {
+  return uri.split('.').pop().toLowerCase();
 };
 
 const handleImagePicked = (response, callback) => {
@@ -30,6 +44,12 @@ const handleImagePicked = (response, callback) => {
     const asset = response.assets[0];
     const uri = asset.uri;
     const fileSize = asset.fileSize;
+
+    const fileExtension = getFileExtension(uri);
+    if (!VALID_IMAGE_EXTENSIONS.includes(fileExtension)) {
+      showUnsupportedFormatAlert();
+      return;
+    }
 
     if (fileSize > MAX_IMAGE_SIZE) {
       showSizeExceededAlert();

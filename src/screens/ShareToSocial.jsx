@@ -19,7 +19,7 @@ const TopBar = React.memo(({onBackPress, onInvitePress}) => (
       <Image
         resizeMode="contain"
         source={require('../assets/icons/invite.png')}
-        style={[styles.iconStyle, {height: height * 0.06, width: width * 0.06}]}
+        style={[styles.iconStyle, {width: 24, height: 24}]}
         tintColor={constants.colors.textSecondary}
       />
     </TouchableOpacity>
@@ -78,7 +78,7 @@ const ShareToSocial = ({route, navigation}) => {
             style={[styles.iconButton, styles.shareButton]}>
             <Image
               source={require('../assets/icons/share.png')}
-              style={[styles.iconStyle, {width: 25, height: 25}]}
+              style={[styles.iconStyle, {width: 24, height: 24}]}
               tintColor="white"
             />
           </TouchableOpacity>
@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: width * 0.06,
     justifyContent: 'space-between',
+    marginVertical: height * 0.02,
   },
   contentContainer: {
     flex: 1,

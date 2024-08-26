@@ -7,7 +7,7 @@ const lightColors = {
   backgroundColor: '#FFFFFF',
   textPrimary: '#000000',
   textSecondary: '#5B5B5B',
-  primary: '#202455',
+  primary: '#4D56C4',
   toggleButtonBackground: '#F4F4F4',
   toggleButtonSelectedText: '#000000',
   buttonBackground: '#F4F4F4',

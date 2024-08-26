@@ -26,6 +26,7 @@ const Footer = ({
   handleColorSelect,
   selectGalleryImage,
   clearBackground,
+  showClearButton,
 }) => {
   const [colorModal, setColorModal] = useState(false);
 
@@ -109,20 +110,22 @@ const Footer = ({
               Image
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            disabled={activeTab === 'Original' ? true : false}
-            style={styles.footerButton}
-            onPress={() => {
-              clearBackground();
-            }}>
-            <Image
-              source={require('../assets/icons/clear.png')}
-              style={styles.footerIcon}
-            />
-            <Text style={styles.footerButtonText} allowFontScaling={false}>
-              Clear
-            </Text>
-          </TouchableOpacity>
+          {showClearButton && (
+            <TouchableOpacity
+              disabled={activeTab === 'Original' ? true : false}
+              style={[styles.footerButton]}
+              onPress={() => {
+                clearBackground();
+              }}>
+              <Image
+                source={require('../assets/icons/clear.png')}
+                style={styles.footerIcon}
+              />
+              <Text style={styles.footerButtonText} allowFontScaling={false}>
+                Clear
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : footerState === 'color' && colorState === null ? (
         <View style={styles.footerButtons}>

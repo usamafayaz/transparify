@@ -1,13 +1,6 @@
 import {CommonActions, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useRef} from 'react';
-import {
-  View,
-  StyleSheet,
-  Image,
-  Animated,
-  StatusBar,
-  Appearance,
-} from 'react-native';
+import {View, StyleSheet, Image, Animated, StatusBar, Text} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import constants from '../config/constants';
 
@@ -16,7 +9,7 @@ const Splash = () => {
   const progressBarWidth = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    let isMounted = true; // Track component mount state
+    let isMounted = true;
 
     const animateProgressBar = () => {
       Animated.timing(progressBarWidth, {
@@ -90,6 +83,9 @@ const Splash = () => {
           ]}
         />
       </View>
+      <Text style={styles.companyName}>
+        Powered by <Text style={{fontWeight: 'bold'}}>Sprinsoft</Text>
+      </Text>
     </View>
   );
 };
@@ -102,8 +98,8 @@ const styles = StyleSheet.create({
     backgroundColor: constants.colors.backgroundColor,
   },
   logo: {
-    height: '10%',
-    width: '20%',
+    height: 75,
+    width: 75,
     marginBottom: '5%',
   },
   progressBarContainer: {
@@ -117,6 +113,12 @@ const styles = StyleSheet.create({
   progressBar: {
     height: '100%',
     backgroundColor: constants.colors.primary,
+  },
+  companyName: {
+    position: 'absolute',
+    bottom: constants.screen.height * 0.035,
+    fontSize: constants.fontSizes.small,
+    color: constants.colors.textSecondary,
   },
 });
 

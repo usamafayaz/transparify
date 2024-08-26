@@ -5,6 +5,10 @@ import Share from 'react-native-share';
 import Permissions from './permissions';
 
 export const useShareAndInvite = (mergedImage, noBackground) => {
+  const appLink =
+    'https://play.google.com/store/apps/details?id=com.transparify';
+  const message = `Check out this image I made with Transparify! 🎨✨\n\nCreate your own:\n${appLink}`;
+
   const handleShare = useCallback(async () => {
     let tempFilePath = null;
     try {
@@ -19,8 +23,7 @@ export const useShareAndInvite = (mergedImage, noBackground) => {
 
       const shareOptions = {
         title: 'Share Image',
-        message:
-          'Check out this awesome image I created with the Transparify app!',
+        message: message,
         url: imageUri,
         type: 'image/png',
       };
@@ -84,13 +87,18 @@ export const useShareAndInvite = (mergedImage, noBackground) => {
 
   const handleWhatsAppShare = useCallback(async () => {
     try {
-      const imageUri = noBackground
-        ? `data:image/png;base64,${mergedImage.split(',')[1]}`
-        : mergedImage;
+      let imageUri = mergedImage;
+      if (noBackground) {
+        imageUri = `data:image/png;base64,${mergedImage.split(',')[1]}`;
+      } else if (!imageUri.startsWith('file://')) {
+        imageUri = `file://${imageUri}`;
+      }
+
       const shareOptions = {
         url: imageUri,
         type: 'image/png',
         social: Share.Social.WHATSAPP,
+        message: message,
       };
       const shareResponse = await Share.shareSingle(shareOptions);
       console.log('WhatsApp share response:', shareResponse);
@@ -107,8 +115,8 @@ export const useShareAndInvite = (mergedImage, noBackground) => {
     try {
       const shareOptions = {
         title: 'Invite Friends',
-        message: 'Join me on the Transparify app and create amazing images!',
-        url: 'https://yourapp.link/invite', // Replace with your app link
+        message: `Join me on the Transparify app and create amazing images! 🎨✨\n`,
+        url: appLink,
       };
       const shareResponse = await Share.open(shareOptions);
       console.log('Invite response:', shareResponse);

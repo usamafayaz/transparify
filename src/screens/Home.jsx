@@ -112,8 +112,6 @@ const Home = ({route}) => {
           const cacheDir = RNFS.CachesDirectoryPath;
           const oldFiles = await RNFS.readDir(cacheDir);
           let filePaths = oldFiles.map(file => file.path);
-          console.log('All Files: ', filePaths);
-          console.log('originalImage: ', originalImage);
 
           filePaths = filePaths.filter(
             path =>
@@ -121,10 +119,6 @@ const Home = ({route}) => {
               path !== originalImage.replace('file://', ''),
           );
           await Promise.all(filePaths.map(path => RNFS.unlink(path)));
-
-          const oldFiless = await RNFS.readDir(cacheDir);
-          let filePathss = oldFiless.map(file => file.path);
-          console.log('After deletion Files: ', filePathss);
 
           navigation.navigate('ShareToSocial', {
             mergedImage: processedImage,
@@ -317,10 +311,7 @@ const Home = ({route}) => {
             <Image
               resizeMode="contain"
               source={require('../assets/icons/right_arrow.png')}
-              style={[
-                styles.iconStyle,
-                {height: height * 0.07, width: width * 0.07},
-              ]}
+              style={[styles.iconStyle, {height: 28, width: 28}]}
               tintColor={constants.colors.white}
             />
           </TouchableOpacity>
@@ -350,6 +341,11 @@ const Home = ({route}) => {
           handleColorSelect={handleColorSelect}
           selectGalleryImage={selectGalleryImage}
           clearBackground={clearBackground}
+          showClearButton={
+            backgroundColor !== null ||
+            selectedGradient !== null ||
+            selectedBackgroundImage !== null
+          }
         />
       </View>
       {isLoading && (
@@ -420,8 +416,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
   },
   iconStyle: {
-    height: height * 0.08,
-    width: width * 0.08,
+    height: 30,
+    width: 30,
+    marginVertical: height * 0.02,
     resizeMode: 'contain',
   },
   loadingContainer: {
