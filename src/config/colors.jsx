@@ -2,7 +2,22 @@
 
 const basicColors = [
   '#0090ff', // Blue
+  '#9ACD32', // Yellow Green
+  '#DC143C', // Crimson
   '#FF0000', // Red
+  '#F4A460', // Sandy Brown
+  '#008000', // Green
+  '#ADD8E6', // Light Blue
+  '#7B68EE', // Medium Slate Blue
+  '#6495ED', // Cornflower Blue
+  '#8B4513', // Saddle Brown
+  '#FFDEAD', // Navajo White
+  '#20B2AA', // Light Sea Green
+  '#9932CC', // Dark Orchid
+  '#FF1493', // Deep Pink
+  '#00CED1', // Dark Turquoise
+  '#8B0000', // Dark Red
+  '#556B2F', // Dark Olive Green
   '#FF7F00', // Orange
   '#FFFF00', // Yellow
   '#00FF00', // Green
@@ -10,6 +25,7 @@ const basicColors = [
   '#800080', // Purple
   '#FF00FF', // Magenta
   '#FFA500', // Orange
+  '#7FFF00', // Chartreuse
   '#808080', // Grey
   '#000000', // Black
   '#FFFFFF', // White
@@ -35,7 +51,6 @@ const basicColors = [
   '#2E8B57', // Sea Green
   '#6A5ACD', // Slate Blue
   '#4682B4', // Steel Blue
-  '#9ACD32', // Yellow Green
 ];
 
 const gradientColors = [
@@ -80,14 +95,13 @@ const gradientColors = [
   ['#FFFF00', '#FF7F50'], // Yellow to Coral
   ['#FFFFE0', '#F08080'], // Soft Yellow to Light Coral
   ['#FFFF00', '#DAA520'], // Yellow to Goldenrod
-  ['#FFFF00', '#FF4500'], // Yellow to Dark Orange
-  ['#FFFF00', '#FF6347'], // Yellow to Tomato
-  ['#FF6347', '#FFA500'], // Tomato to Orange
-  ['#FF4500', '#FF8C00'], // Orange Red to Deep Orange
+  ['#FFD700', '#FF4500'], // Gold to Dark Orange
+  ['#FF6347', '#FF4500'], // Tomato to Dark Orange
+  ['#FFA07A', '#FF6347'], // Light Salmon to Tomato
   ['#FF7F50', '#FFD700'], // Coral to Gold
-  ['#FF8C00', '#FF4500'], // Deep Orange to Orange Red
-  ['#FF4500', '#FF6347'], // Orange Red to Tomato
-  ['#FFA07A', '#FF4500'], // Light Salmon to Orange Red
+  ['#FF8C00', '#FF6347'], // Deep Orange to Tomato
+  ['#FF4500', '#FF7F50'], // Dark Orange to Coral
+  ['#FFA07A', '#FF4500'], // Light Salmon to Dark Orange
 ];
 
 export {basicColors, gradientColors};

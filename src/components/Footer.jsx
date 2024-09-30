@@ -13,7 +13,7 @@ import {basicColors, gradientColors} from '../config/colors';
 import constants from '../config/constants';
 import {openImagePicker} from '../utils/imagePicker';
 
-import ColorPickerModal from './ColorPickerModal';
+// import ColorPickerModal from './ColorPickerModal';
 
 const {width, height} = Dimensions.get('window');
 

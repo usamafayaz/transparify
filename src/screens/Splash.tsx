@@ -83,9 +83,18 @@ const Splash = () => {
           ]}
         />
       </View>
-      <Text style={styles.companyName}>
-        Powered by <Text style={{fontWeight: 'bold'}}>Sprinsoft</Text>
-      </Text>
+      <View style={styles.companyInfoContainer}>
+        <Text style={styles.fromText}>from</Text>
+        <View style={styles.companyRow}>
+          <Image
+            source={require('../assets/icons/sprinsoft_logo.png')} // Replace with your logo path
+            style={styles.companyLogo}
+            resizeMode="contain"
+            tintColor={constants.colors.textSecondary}
+          />
+          <Text style={styles.companyName}>Sprinsoft</Text>
+        </View>
+      </View>
     </View>
   );
 };
@@ -114,11 +123,29 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: constants.colors.primary,
   },
-  companyName: {
+  companyInfoContainer: {
     position: 'absolute',
-    bottom: constants.screen.height * 0.035,
+    bottom: constants.screen.height * 0.05,
+    alignItems: 'center',
+  },
+  companyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: constants.screen.height * 0.005,
+  },
+  fromText: {
+    fontSize: constants.fontSizes.small,
+    color: 'grey',
+  },
+  companyLogo: {
+    height: 15,
+    width: 15,
+    marginRight: 6,
+  },
+  companyName: {
     fontSize: constants.fontSizes.small,
     color: constants.colors.textSecondary,
+    fontWeight: 'bold',
   },
 });
 
