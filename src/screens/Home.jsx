@@ -7,7 +7,6 @@ import {
   Animated,
   BackHandler,
   ToastAndroid,
-  ActivityIndicator,
   StatusBar,
 } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -350,21 +349,26 @@ const Home = ({route}) => {
       </View>
       {isLoading && (
         <View style={styles.loadingContainer}>
-          <LottieView
-            source={
-              constants.colorScheme === 'dark'
-                ? require('../assets/animation/loading_dark.json')
-                : require('../assets/animation/loading_light.json')
-            }
-            autoPlay
-            loop
-            style={styles.lottieAnimation}
-          />
+          <View style={styles.lottieContainer}>
+            <LottieView
+              source={require('../assets/animation/loading.json')}
+              autoPlay
+              loop
+              style={styles.lottieAnimation}
+            />
+          </View>
         </View>
       )}
       {isNextLoading && (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size={35} color={constants.colors.primary} />
+          <View style={styles.lottieContainer}>
+            <LottieView
+              source={require('../assets/animation/loading.json')}
+              autoPlay
+              loop
+              style={styles.lottieAnimation}
+            />
+          </View>
         </View>
       )}
       <DiscardChangesModal
@@ -433,6 +437,14 @@ const styles = StyleSheet.create({
   lottieAnimation: {
     width: 200,
     height: 200,
+  },
+  lottieContainer: {
+    width: 80,
+    height: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 100,
   },
 });
 

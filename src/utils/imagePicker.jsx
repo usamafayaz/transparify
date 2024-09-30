@@ -1,14 +1,7 @@
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import Permissions from './permissions';
 import {Alert, Platform} from 'react-native';
-
-const options = {
-  mediaType: 'photo',
-  quality: 1,
-  includeBase64: false,
-  maxWidth: 6000,
-  maxHeight: 6000,
-};
+import constants from '../config/constants';
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
 
@@ -34,30 +27,20 @@ const getFileExtension = uri => {
   return uri.split('.').pop().toLowerCase();
 };
 
-const handleImagePicked = (response, callback) => {
-  if (response.didCancel) return;
-  if (response.errorCode) {
-    console.error('ImagePicker Error: ', response.errorMessage);
+const handleImagePicked = (image, callback) => {
+  const {path, size} = image;
+  const fileExtension = getFileExtension(path);
+
+  if (!VALID_IMAGE_EXTENSIONS.includes(fileExtension)) {
+    showUnsupportedFormatAlert();
     return;
   }
-  if (response.assets && response.assets.length > 0) {
-    const asset = response.assets[0];
-    const uri = asset.uri;
-    const fileSize = asset.fileSize;
 
-    const fileExtension = getFileExtension(uri);
-    if (!VALID_IMAGE_EXTENSIONS.includes(fileExtension)) {
-      showUnsupportedFormatAlert();
-      return;
-    }
-
-    if (fileSize > MAX_IMAGE_SIZE) {
-      showSizeExceededAlert();
-      return;
-    }
-
-    callback(uri);
+  if (size > MAX_IMAGE_SIZE) {
+    showSizeExceededAlert();
+    return;
   }
+  callback(path);
 };
 
 const openGallery = async callback => {
@@ -67,9 +50,24 @@ const openGallery = async callback => {
     if (!result) return;
   }
 
-  launchImageLibrary({...options, selectionLimit: 1}, response =>
-    handleImagePicked(response, callback),
-  );
+  ImagePicker.openPicker({
+    mediaType: 'photo',
+    cropping: true, // Enable cropping
+    includeBase64: false,
+    compressImageQuality: 1,
+    freeStyleCropEnabled: true,
+    cropperCircleOverlay: false,
+    cropperStatusBarColor: '#20242F',
+    cropperToolbarColor: '#20242F',
+    maxFiles: 1,
+    cropperToolbarWidgetColor: 'white',
+  })
+    .then(image => handleImagePicked(image, callback))
+    .catch(error => {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        console.error('ImagePicker Error: ', error);
+      }
+    });
 };
 
 const openCamera = async callback => {
@@ -88,7 +86,22 @@ const openCamera = async callback => {
     }
   }
 
-  launchCamera(options, response => handleImagePicked(response, callback));
+  ImagePicker.openCamera({
+    mediaType: 'photo',
+    cropping: true, // Enable cropping
+    includeBase64: false,
+    compressImageQuality: 1,
+    freeStyleCropEnabled: true,
+    cropperCircleOverlay: false,
+    cropperStatusBarColor: '#4d4f4f',
+    cropperToolbarColor: '#4d4f4f',
+  })
+    .then(image => handleImagePicked(image, callback))
+    .catch(error => {
+      if (error.code !== 'E_PICKER_CANCELLED') {
+        console.error('ImagePicker Error: ', error);
+      }
+    });
 };
 
 export {openGallery as openImagePicker, openCamera};
