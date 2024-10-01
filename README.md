@@ -32,7 +32,7 @@ Transparify allows users to remove backgrounds from images taken from the camera
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/usamafayaz/Transparify.git
+   git clone https://github.com/sprinsoft/Transparify.git
    ```
 
    
@@ -54,3 +54,7 @@ Transparify allows users to remove backgrounds from images taken from the camera
 
 ## Contact
 For any inquiries, please contact [usama.fayyaz157@gmail.com].
+
+![Alt text](./images/image1.png)
+
+![Alt text](./images/image2.png)
