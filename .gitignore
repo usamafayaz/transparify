@@ -65,7 +65,5 @@ yarn-error.log
 # testing
 /coverage
 
-src/config/
-!src/config/colors.jsx
-!src/config/constants.jsx
+src/config/apiUrl.jsx
 
