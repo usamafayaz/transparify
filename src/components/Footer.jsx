@@ -9,7 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {basicColors, gradientColors} from '../config/colors';
+import {basicColors, gradientColors} from '../config/colorsList';
 import constants from '../config/constants';
 import {openImagePicker} from '../utils/imagePicker';
 

@@ -2,6 +2,7 @@
 
 const basicColors = [
   '#0090ff', // Blue
+  '#EB7103', // Orange
   '#9ACD32', // Yellow Green
   '#DC143C', // Crimson
   '#FF0000', // Red
@@ -107,18 +108,18 @@ const gradientColors = [
 export {basicColors, gradientColors};
 
 /*
-function getRandomColor() {
-  return basicColors[Math.floor(Math.random() * basicColors.length)];
-}
-
-const gradientColors = [];
-for (let i = 0; i < 20; i++) {
-  const color1 = getRandomColor();
-  let color2 = getRandomColor();
-  while (color1 === color2) {
-    color2 = getRandomColor();
+  function getRandomColor() {
+    return basicColors[Math.floor(Math.random() * basicColors.length)];
   }
-  gradientColors.push([color1, color2]);
-}*/
+  
+  const gradientColors = [];
+  for (let i = 0; i < 20; i++) {
+    const color1 = getRandomColor();
+    let color2 = getRandomColor();
+    while (color1 === color2) {
+      color2 = getRandomColor();
+    }
+    gradientColors.push([color1, color2]);
+  }*/
 
 //    "react-native-reanimated": "^3.8.1",

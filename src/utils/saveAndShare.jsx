@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {ToastAndroid} from 'react-native';
+import {ToastAndroid, Linking, Platform} from 'react-native';
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 import Permissions from './permissions';
@@ -89,27 +89,49 @@ export const useShareAndInvite = (mergedImage, noBackground) => {
     try {
       let imageUri = mergedImage;
       if (noBackground) {
-        imageUri = `data:image/png;base64,${mergedImage.split(',')[1]}`;
+        const tempFilePath = `${
+          RNFS.CachesDirectoryPath
+        }/tnspym${Date.now()}.png`;
+        await RNFS.writeFile(tempFilePath, mergedImage.split(',')[1], 'base64');
+        imageUri = `file://${tempFilePath}`;
       } else if (!imageUri.startsWith('file://')) {
         imageUri = `file://${imageUri}`;
       }
 
       const shareOptions = {
+        title: 'Share via WhatsApp',
+        message: message,
         url: imageUri,
         type: 'image/png',
         social: Share.Social.WHATSAPP,
-        message: message,
+        whatsAppNumber: '', // Leave empty to allow user to choose contact
       };
-      const shareResponse = await Share.shareSingle(shareOptions);
-      console.log('WhatsApp share response:', shareResponse);
+
+      // Check if WhatsApp is installed
+      const isWhatsAppInstalled = await Share.isPackageInstalled(
+        'com.whatsapp',
+      );
+
+      if (isWhatsAppInstalled) {
+        // Use react-native-share to share directly to WhatsApp
+        await Share.shareSingle(shareOptions);
+      } else {
+        // WhatsApp is not installed, fall back to general share
+        ToastAndroid.show('WhatsApp is not installed', ToastAndroid.SHORT);
+        await Share.open(shareOptions);
+      }
     } catch (error) {
       console.log('Error sharing on WhatsApp:', error);
-      ToastAndroid.show(
-        'Failed to share image on WhatsApp.',
-        ToastAndroid.SHORT,
-      );
+      if (error.message.includes('User did not share')) {
+        console.log('User cancelled sharing');
+      } else {
+        ToastAndroid.show(
+          'Failed to share image on WhatsApp.',
+          ToastAndroid.SHORT,
+        );
+      }
     }
-  }, [mergedImage, noBackground]);
+  }, [mergedImage, noBackground, message]);
 
   const handleInvite = useCallback(async () => {
     try {
