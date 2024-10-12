@@ -5,7 +5,7 @@ import constants from '../config/constants';
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB in bytes
 
-const VALID_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png'];
+const VALID_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'heif', 'heic'];
 
 const showSizeExceededAlert = () => {
   Alert.alert(
@@ -60,6 +60,7 @@ const openGallery = async callback => {
     cropperStatusBarColor: '#20242F',
     cropperToolbarColor: '#20242F',
     maxFiles: 1,
+    forceJpg: true,
     cropperToolbarWidgetColor: 'white',
   })
     .then(image => handleImagePicked(image, callback))

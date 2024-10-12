@@ -285,7 +285,7 @@ const Home = ({route}) => {
           }
           backgroundColor={
             constants.colorScheme == 'dark'
-              ? 'rgba(0, 0, 0, 0.8)'
+              ? 'rgba(0, 0, 0, 0.5)'
               : 'rgba(0, 0, 0, 0.1)'
           }
         />
@@ -432,16 +432,16 @@ const styles = StyleSheet.create({
     backgroundColor:
       constants.colorScheme === 'light'
         ? 'rgba(0, 0, 0, 0.1)'
-        : 'rgba(0, 0, 0, 0.8)',
+        : 'rgba(0, 0, 0, 0.5)',
   },
   lottieAnimation: {
-    width: 200,
-    height: 200,
+    width: 210,
+    height: 210,
   },
   lottieContainer: {
     width: 80,
     height: 80,
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 100,
