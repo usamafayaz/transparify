@@ -77,6 +77,9 @@ const ImageUpload = () => {
   return (
     <>
       <View style={styles.container}>
+        <View style={styles.topRightCircle} />
+        <View style={styles.topLeftCircle} />
+        <View style={styles.bottomLeftCircle} />
         <Image
           source={require('../assets/images/transform.png')}
           style={styles.mainImageStyle}
@@ -86,6 +89,7 @@ const ImageUpload = () => {
           Choose an image
         </Text>
         <TouchableOpacity
+          activeOpacity={0.5}
           style={styles.buttonContainer}
           onPress={() => openCamera(handleImagePicked)}>
           <Image
@@ -97,6 +101,7 @@ const ImageUpload = () => {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          activeOpacity={0.5}
           style={styles.buttonContainer}
           onPress={() => openImagePicker(handleImagePicked)}>
           <Image
@@ -139,7 +144,7 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: width * 0.75,
     backgroundColor: constants.colors.buttonBackground,
-    borderRadius: 40,
+    borderRadius: 10,
     paddingVertical: height * 0.013,
     marginVertical: height * 0.012,
     alignItems: 'center',
@@ -153,6 +158,36 @@ const styles = StyleSheet.create({
     fontSize: constants.fontSizes.medium,
     fontWeight: '600',
     marginLeft: width * 0.02,
+  }, // Decorative Elements Styles
+  topRightCircle: {
+    position: 'absolute',
+    top: -height * 0.1,
+    right: -width * 0.1,
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: width * 0.2,
+    backgroundColor: constants.colors.primary,
+    opacity: 0.1,
+  },
+  topLeftCircle: {
+    position: 'absolute',
+    top: height * 0.05,
+    left: -width * 0.15,
+    width: width * 0.3,
+    height: width * 0.3,
+    borderRadius: width * 0.15,
+    backgroundColor: constants.colors.textPrimary,
+    opacity: 0.05,
+  },
+  bottomLeftCircle: {
+    position: 'absolute',
+    bottom: -height * 0.1,
+    left: -width * 0.2,
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: width * 0.2,
+    backgroundColor: constants.colors.primary,
+    opacity: 0.08,
   },
 });
 

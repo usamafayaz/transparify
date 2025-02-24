@@ -7,7 +7,7 @@ const {width, height} = constants.screen;
 
 const TopBar = React.memo(({onBackPress, onInvitePress}) => (
   <View style={styles.topBar}>
-    <TouchableOpacity onPress={onBackPress}>
+    <TouchableOpacity activeOpacity={0.5} onPress={onBackPress}>
       <Image
         resizeMode="contain"
         source={require('../assets/icons/left_arrow.png')}
@@ -15,7 +15,7 @@ const TopBar = React.memo(({onBackPress, onInvitePress}) => (
         tintColor={constants.colors.textSecondary}
       />
     </TouchableOpacity>
-    <TouchableOpacity onPress={onInvitePress}>
+    <TouchableOpacity activeOpacity={0.5} onPress={onInvitePress}>
       <Image
         resizeMode="contain"
         source={require('../assets/icons/invite.png')}
@@ -57,6 +57,7 @@ const ShareToSocial = ({route, navigation}) => {
         </View>
         <View style={styles.iconRow}>
           <TouchableOpacity
+            activeOpacity={0.5}
             onPress={handleSaveToGallery}
             style={[styles.iconButton, styles.saveButton]}>
             <Image
@@ -66,6 +67,7 @@ const ShareToSocial = ({route, navigation}) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
+            activeOpacity={0.5}
             onPress={handleWhatsAppShare}
             style={[styles.iconButton, styles.whatsappButton]}>
             <Image
@@ -74,6 +76,7 @@ const ShareToSocial = ({route, navigation}) => {
             />
           </TouchableOpacity>
           <TouchableOpacity
+            activeOpacity={0.5}
             onPress={handleShare}
             style={[styles.iconButton, styles.shareButton]}>
             <Image

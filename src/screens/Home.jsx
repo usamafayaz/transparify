@@ -291,7 +291,9 @@ const Home = ({route}) => {
         />
       )}
       <View style={styles.topBar}>
-        <TouchableOpacity onPress={() => setIsDiscardModalVisible(true)}>
+        <TouchableOpacity
+          activeOpacity={0.5}
+          onPress={() => setIsDiscardModalVisible(true)}>
           <Image
             resizeMode="contain"
             source={require('../assets/icons/left_arrow.png')}
@@ -301,6 +303,7 @@ const Home = ({route}) => {
         </TouchableOpacity>
         {activeTab !== 'Original' && (
           <TouchableOpacity
+            activeOpacity={0.5}
             style={styles.rightArrow}
             onPress={() => {
               setIsNextLoading(true);

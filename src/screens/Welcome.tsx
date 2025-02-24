@@ -8,6 +8,10 @@ const Welcome = () => {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
+      <View style={styles.topRightCircle} />
+      <View style={styles.topLeftCircle} />
+      <View style={styles.bottomLeftCircle} />
+
       <Image
         source={require('../assets/images/logo.png')}
         style={styles.imageStyle}
@@ -22,6 +26,7 @@ const Welcome = () => {
         transparent PNGs.
       </Text>
       <TouchableOpacity
+        activeOpacity={0.5}
         style={styles.buttonContainer}
         onPress={() => {
           navigation.dispatch(
@@ -46,6 +51,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: width * 0.07,
     justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  topRightCircle: {
+    position: 'absolute',
+    top: -height * 0.1,
+    right: -width * 0.1,
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: width * 0.2,
+    backgroundColor: constants.colors.primary,
+    opacity: 0.1,
+  },
+  topLeftCircle: {
+    position: 'absolute',
+    top: height * 0.05,
+    left: -width * 0.15,
+    width: width * 0.3,
+    height: width * 0.3,
+    borderRadius: width * 0.15,
+    backgroundColor: constants.colors.textPrimary,
+    opacity: 0.05,
+  },
+  bottomLeftCircle: {
+    position: 'absolute',
+    bottom: -height * 0.1,
+    left: -width * 0.2,
+    width: width * 0.4,
+    height: width * 0.4,
+    borderRadius: width * 0.2,
+    backgroundColor: constants.colors.primary,
+    opacity: 0.08,
   },
   imageStyle: {
     marginTop: height * 0.3,
@@ -66,9 +102,9 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.005,
   },
   buttonContainer: {
-    width: '100%',
+    width: '90%',
     backgroundColor: constants.colors.primary,
-    borderRadius: height * 0.04,
+    borderRadius: 10,
     padding: height * 0.015,
     marginTop: height * 0.2,
     alignItems: 'center',

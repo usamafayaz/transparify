@@ -1,5 +1,5 @@
 import {useCallback} from 'react';
-import {ToastAndroid, Linking, Platform} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import RNFS from 'react-native-fs';
 import Share from 'react-native-share';
 import Permissions from './permissions';

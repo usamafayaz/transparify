@@ -36,6 +36,7 @@ const Footer = ({
 
   const renderColorOption = ({item}) => (
     <TouchableOpacity
+      activeOpacity={0.5}
       disabled={activeTab === 'Original' ? true : false}
       style={[
         styles.footerButton,
@@ -54,6 +55,7 @@ const Footer = ({
 
   const renderGradientOption = ({item}) => (
     <TouchableOpacity
+      activeOpacity={0.5}
       disabled={activeTab === 'Original' ? true : false}
       onPress={() => handleColorSelect(item)}>
       <LinearGradient
@@ -87,6 +89,7 @@ const Footer = ({
       {footerState === 'initial' ? (
         <View style={styles.footerButtons}>
           <TouchableOpacity
+            activeOpacity={0.5}
             disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => updateFooter('color')}>
@@ -99,6 +102,7 @@ const Footer = ({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            activeOpacity={0.5}
             disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => openImagePicker(selectGalleryImage)}>
@@ -112,6 +116,7 @@ const Footer = ({
           </TouchableOpacity>
           {showClearButton && (
             <TouchableOpacity
+              activeOpacity={0.5}
               disabled={activeTab === 'Original' ? true : false}
               style={[styles.footerButton]}
               onPress={() => {
@@ -130,6 +135,7 @@ const Footer = ({
       ) : footerState === 'color' && colorState === null ? (
         <View style={styles.footerButtons}>
           <TouchableOpacity
+            activeOpacity={0.5}
             disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => updateFooter('initial')}>
@@ -140,6 +146,7 @@ const Footer = ({
             />
           </TouchableOpacity>
           <TouchableOpacity
+            activeOpacity={0.5}
             disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => {
@@ -154,6 +161,7 @@ const Footer = ({
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            activeOpacity={0.5}
             disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => {
@@ -171,6 +179,7 @@ const Footer = ({
       ) : (
         <View style={styles.footerButtons}>
           <TouchableOpacity
+            activeOpacity={0.5}
             disabled={activeTab === 'Original' ? true : false}
             style={styles.footerButton}
             onPress={() => setColorState(null)}>
@@ -181,7 +190,8 @@ const Footer = ({
             />
           </TouchableOpacity>
           {/* {colorState === 'solid' && (
-            <TouchableOpacity
+            <TouchableOpacity           activeOpacity={0.5}
+
               disabled={activeTab === 'Original' ? true : false}
               style={styles.footerButton}
               onPress={() => setColorModal(true)}>
