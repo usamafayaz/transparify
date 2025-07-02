@@ -32,7 +32,7 @@ Transparify allows users to remove backgrounds from images taken from the camera
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/sprinsoft/transparify.git
+   git clone https://github.com/usamafayaz/transparify.git
    ```
 2. Navigate to the project directory:
 
@@ -42,8 +42,8 @@ Transparify allows users to remove backgrounds from images taken from the camera
 
 3. Install React Native packages and dependencies:
 
-   ```npm install
-
+   ```bash
+      npm install
    ```
 
 4. Start the React Native frontend:
